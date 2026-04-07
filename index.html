@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -53,7 +54,7 @@
             const [selectedDiscipline, setSelectedDiscipline] = useState('');
 
             const totalPages = 18;
-            const apiKey = ""; // Inserire API Key per abilitare la IA
+            const apiKey = "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"; // Inserire API Key per abilitare la IA
 
             const nextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1));
             const prevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 0));
