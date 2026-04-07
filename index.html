@@ -1,464 +1,575 @@
-{\rtf1\ansi\ansicpg1252\cocoartf2868
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-{\*\expandedcolortbl;;}
-\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curricolo Cittadinanza Digitale - Liceo Volterra</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; color: #1e293b; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .pulse-btn { animation: pulse-orange 2s infinite; }
+        @keyframes pulse-orange {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 124, 0, 0.4); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(245, 124, 0, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 124, 0, 0); }
+        }
+        @media print { .no-print { display: none !important; } }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
 
-\f0\fs24 \cf0 <!DOCTYPE html>\
-<html lang="it">\
-<head>\
-    <meta charset="UTF-8">\
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">\
-    <title>Curricolo Cittadinanza Digitale - Liceo Volterra</title>\
-    <script src="https://cdn.tailwindcss.com"></script>\
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>\
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>\
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>\
-    <script src="https://unpkg.com/lucide@latest"></script>\
-    <style>\
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');\
-        body \{ font-family: 'Inter', sans-serif; background-color: #f1f5f9; color: #1e293b; \}\
-        .custom-scrollbar::-webkit-scrollbar \{ width: 6px; \}\
-        .custom-scrollbar::-webkit-scrollbar-track \{ background: transparent; \}\
-        .custom-scrollbar::-webkit-scrollbar-thumb \{ background: #cbd5e1; border-radius: 10px; \}\
-        .pulse-btn \{ animation: pulse-orange 2s infinite; \}\
-        @keyframes pulse-orange \{\
-            0% \{ transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 124, 0, 0.4); \}\
-            70% \{ transform: scale(1.05); box-shadow: 0 0 0 10px rgba(245, 124, 0, 0); \}\
-            100% \{ transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 124, 0, 0); \}\
-        \}\
-        @media print \{ .no-print \{ display: none !important; \} \}\
-    </style>\
-</head>\
-<body>\
-    <div id="root"></div>\
-\
-    <script type="text/babel">\
-        const \{ useState, useEffect, useRef \} = React;\
-\
-        // Componente Icona sicuro per prevenire errori di rimozione nodi\
-        const Icon = (\{ name, size = 18, className = "" \}) => \{\
-            const containerRef = useRef(null);\
-            useEffect(() => \{\
-                if (!containerRef.current || !window.lucide || !name) return;\
-                containerRef.current.innerHTML = '';\
-                const i = document.createElement('i');\
-                i.setAttribute('data-lucide', name);\
-                containerRef.current.appendChild(i);\
-                window.lucide.createIcons(\{ root: containerRef.current, attrs: \{ width: size, height: size \} \});\
-            \}, [name, size]);\
-            return <span ref=\{containerRef\} className=\{`inline-flex items-center justify-center $\{className\}`\} />;\
-        \};\
-\
-        const App = () => \{\
-            const [currentPage, setCurrentPage] = useState(0);\
-            const [aiLoading, setAiLoading] = useState(false);\
-            const [isModalOpen, setIsModalOpen] = useState(false);\
-            const [modalContent, setModalContent] = useState(\{ title: '', body: '' \});\
-            const [selectedOutcomes, setSelectedOutcomes] = useState([]);\
-            const [selectedLevel, setSelectedLevel] = useState('');\
-            const [selectedDiscipline, setSelectedDiscipline] = useState('');\
-\
-            const totalPages = 15;\
-            const apiKey = ""; // Inserire API Key per IA\
-\
-            const nextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1));\
-            const prevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 0));\
-            const goToPage = (pageIndex) => setCurrentPage(pageIndex);\
-\
-            const learningOutcomes = [\
-                \{ area: "Area 1: Informazioni e dati", id: "1.1", text: "Articolare i bisogni informativi, cercare dati e informazioni.", icon: "search" \},\
-                \{ area: "Area 1: Informazioni e dati", id: "1.2", text: "Valutare criticamente l'attendibilit\'e0 delle fonti.", icon: "check-circle" \},\
-                \{ area: "Area 2: Comunicazione", id: "2.1", text: "Interagire attraverso tecnologie digitali.", icon: "message-square" \},\
-                \{ area: "Area 2: Comunicazione", id: "2.3", text: "Esercitare la cittadinanza attraverso servizi digitali.", icon: "globe" \},\
-                \{ area: "Area 3: Creazione contenuti", id: "3.1", text: "Sviluppare e gestire contenuti digitali.", icon: "pen-tool" \},\
-                \{ area: "Area 4: Sicurezza", id: "4.1", text: "Proteggere dispositivi e contenuti (Cybersecurity).", icon: "lock" \},\
-                \{ area: "Area 4: Sicurezza", id: "4.2", text: "Protezione dei dati personali e della privacy (GDPR).", icon: "shield" \},\
-                \{ area: "Area 4: Benessere", id: "4.3", text: "Tutelare la salute e il benessere (Cyberbullismo).", icon: "activity" \},\
-                \{ area: "Area 4: Sostenibilit\'e0", id: "4.4", text: "Comprendere l'impatto ambientale delle tecnologie.", icon: "leaf" \},\
-                \{ area: "Area 5: Problem Solving", id: "5.1", text: "Risolvere problemi tecnici.", icon: "wrench" \},\
-                \{ area: "Area 5: Problem Solving", id: "5.2", text: "Individuare bisogni e risposte tecnologiche.", icon: "target" \},\
-                \{ area: "Area 5: Problem Solving", id: "5.3", text: "Usare tecnologie in modo creativo.", icon: "zap" \}\
-            ];\
-\
-            const rubricheData = \{\
-                C10: [\
-                    \{ id: "10.1", titolo: "Validazione epistemologica", livelli: ["Ricerca poco mirata; non distingue fonti affidabili.", "Riconosce fonti attendibili con supporto.", "Verifica l'attendibilit\'e0 e distingue fatti da opinioni.", "Valida dataset complessi applicando il metodo scientifico e riconoscendo bias."] \},\
-                    \{ id: "10.2", titolo: "Dati e algoritmi", livelli: ["Legge grafici con difficolt\'e0.", "Interpreta grafici e dataset semplici.", "Analizza dataset distinguendo dato e interpretazione.", "Riconosce limiti e bias nei modelli algoritmici."] \},\
-                    \{ id: "10.3", titolo: "Produzione responsabile", livelli: ["Produce contenuti semplici senza citare fonti.", "Cita le fonti principali e rispetta il copyright.", "Rielabora informazioni integrando fonti diverse.", "Produce contenuti originali dichiarando l'uso di IA."] \}\
-                ],\
-                C11: [\
-                    \{ id: "11.1", titolo: "Adeguatezza comunicativa", livelli: ["Comunica senza considerare il contesto.", "Rispetta le regole base della netiquette.", "Adatta il registro al contesto e ai destinatari.", "Gestisce la comunicazione pubblica con rigore etico."] \},\
-                    \{ id: "11.2", titolo: "Argomentazione e rigore", livelli: ["Espone opinioni senza fonti verificabili.", "Usa fonti suggerite per esporre idee.", "Costruisce argomentazioni basate su dati affidabili.", "Modera discussioni contrastando la polarizzazione."] \}\
-                ],\
-                C12: [\
-                    \{ id: "12.1", titolo: "Identit\'e0 e dati", livelli: ["Scarsa consapevolezza dei dati personali.", "Usa impostazioni base di privacy.", "Riflette criticamente sull'impronta digitale.", "Analizza criticamente profilazione e web reputation."] \},\
-                    \{ id: "12.2", titolo: "Sicurezza e rischio", livelli: ["Non riconosce minacce digitali comuni.", "Riconosce minacce e applica misure semplici suggerite.", "Applica comportamenti sicuri in dispositivi differenti.", "Analizza situazioni di rischio e adotta strategie efficaci."] \},\
-                    \{ id: "12.3", titolo: "Benessere e sostenibilit\'e0", livelli: ["Non riconosce gli effetti dell'uso eccessivo.", "Riconosce comportamenti dannosi per salute e relazioni.", "Applica strategie di uso equilibrato.", "Analizza l'impatto ambientale e promuove pratiche sostenibili."] \}\
-                ]\
-            \};\
-\
-            const handleGenerateActivity = async () => \{\
-                if (selectedOutcomes.length === 0 || !selectedLevel || !selectedDiscipline) return;\
-                setAiLoading(true);\
-                const outcomesText = selectedOutcomes.map(o => `[$\{o.id\}] $\{o.text\}`).join(", ");\
-                const prompt = `Progetta un'attivit\'e0 didattica di 2 ore per il Liceo Scientifico (Target: $\{selectedLevel\}, Disciplina: $\{selectedDiscipline\}) focalizzata su: $\{outcomesText\}. Usa il metodo scientifico e fai riferimento al framework DigComp 3.0. Rispondi in italiano in formato Markdown.`;\
-                try \{\
-                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=$\{apiKey\}`, \{ method: 'POST', headers: \{ 'Content-Type': 'application/json' \}, body: JSON.stringify(\{ contents: [\{ parts: [\{ text: prompt \}] \}] \}) \});\
-                    const result = await response.json();\
-                    setModalContent(\{ title: `Laboratorio: $\{selectedDiscipline\}`, body: result.candidates?.[0]?.content?.parts?.[0]?.text \});\
-                    setIsModalOpen(true);\
-                \} catch (e) \{ setModalContent(\{ title: "Errore", body: "Inserire una API Key valida nel codice sorgente." \}); setIsModalOpen(true); \}\
-                setAiLoading(false);\
-            \};\
-\
-            const toggleOutcome = (outcome) => \{\
-                if (selectedOutcomes.find(o => o.id === outcome.id)) setSelectedOutcomes(selectedOutcomes.filter(o => o.id !== outcome.id));\
-                else if (selectedOutcomes.length < 2) setSelectedOutcomes([...selectedOutcomes, outcome]);\
-            \};\
-\
-            const SectionHeader = (\{ num, title \}) => (\
-                <div className="mb-6 shrink-0"><div className="flex items-center gap-2 mb-1"><div className="h-[2px] w-8 bg-blue-600"></div><span className="text-[10px] font-bold text-blue-600 uppercase">Sezione \{num\}</span></div><h2 className="text-3xl font-black text-slate-900 uppercase leading-tight">\{title\}</h2></div>\
-            );\
-\
-            const renderRubrica = (title, data) => (\
-                <div className="flex-1 flex flex-col overflow-hidden"><h3 className="text-lg font-bold text-slate-700 mb-4 uppercase">\{title\}</h3><div className="flex-1 overflow-auto rounded-3xl border border-slate-200 bg-white shadow-sm custom-scrollbar"><table className="w-full text-[11px] border-collapse"><thead className="sticky top-0 bg-slate-900 text-white"><tr><th className="p-4 text-left">Traguardo</th><th className="p-4 border-l border-white/10">Iniziale</th><th className="p-4 border-l border-white/10">Base</th><th className="p-4 border-l border-white/10">Intermedio</th><th className="p-4 border-l border-white/10">Avanzato</th></tr></thead><tbody className="divide-y divide-slate-100 text-slate-600">\{data.map((t, i) => (<tr key=\{i\} className="hover:bg-slate-50"><td className="p-4 font-bold bg-slate-50 text-slate-900">\{t.id\}<br/><span className="text-[9px] uppercase opacity-50">\{t.titolo\}</span></td>\{t.livelli.map((l, j) => (<td key=\{j\} className="p-4 border-l border-slate-100">\{l\}</td>))\}</tr>))\}</tbody></table></div></div>\
-            );\
-\
-            const renderPage = () => \{\
-                switch(currentPage) \{\
-                    case 0: return (\
-                        <div className="flex-1 flex flex-col justify-center items-center text-center p-6">\
-                            <div className="mb-8 p-4 bg-blue-50 text-blue-600 rounded-3xl"><Icon name="globe" size=\{48\} /></div>\
-                            <span className="text-sm font-black text-blue-600 uppercase tracking-widest">Liceo Scientifico Volterra</span>\
-                            <h1 className="text-7xl font-black text-slate-900 leading-none mb-8">CURRICOLO DI<br/><span className="text-blue-600">CITTADINANZA<br/>DIGITALE</span></h1>\
-                            <div className="w-32 h-2 bg-orange-500 rounded-full mb-12" />\
-                            <p className="text-slate-400 font-bold max-w-sm uppercase">Documento Integrale per PTOF</p>\
-                            <button onClick=\{nextPage\} className="no-print bg-slate-900 text-white px-16 py-6 rounded-3xl font-black uppercase tracking-widest shadow-2xl hover:bg-blue-600 transition-all transform hover:-translate-y-1">Consulta \uc0\u10024 </button>\
-                        </div>\
-                    );\
-                    case 1: return (\
-                        <div className="h-full flex flex-col">\
-                            <SectionHeader num="0" title="Indice del Curricolo" />\
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4 overflow-y-auto pr-2 custom-scrollbar">\
-                                \{[\
-                                    \{t:"1. Premessa Metodologica", p:2\}, \{t:"Progressione e Metodi (1.4-1.6)", p:3\}, \{t:"2. Framework DigComp 3.0", p:4\}, \{t:"3. Dimensione IA", p:5\}, \{t:"4. Struttura e Traguardi (C10-12)", p:6\}, \{t:"4.4 Integrazione Discipline", p:7\}, \{t:"5. Progressione Verticale", p:8\}, \{t:"6. Rubrica Valutazione C10", p:9\}, \{t:"6. Rubrica Valutazione C11", p:10\}, \{t:"6. Rubrica Valutazione C12", p:11\}, \{t:"7. Laboratorio Competenze \uc0\u10024 ", p:12\}, \{t:"8-9. Valutazione e Monitoraggio", p:13\}, \{t:"Esportazione Ufficiale", p:14\}\
-                                ].map((item, i) => (\
-                                    <button key=\{i\} onClick=\{() => goToPage(item.p)\} className="text-left p-5 bg-white rounded-2xl border border-slate-100 hover:border-blue-500 hover:shadow-lg flex justify-between items-center group transition-all">\
-                                        <span className="font-bold text-slate-700 text-xs group-hover:text-blue-600">\{item.t\}</span>\
-                                        <Icon name="chevron-right" className="text-slate-200 group-hover:text-blue-500" />\
-                                    </button>\
-                                ))\}\
-                            </div>\
-                        </div>\
-                    );\
-                    case 2: return (\
-                        <div className="space-y-6 overflow-y-auto pr-2 custom-scrollbar">\
-                            <SectionHeader num="1" title="Premessa Metodologica" />\
-                            <div className="p-6 bg-white rounded-3xl shadow-sm border border-slate-100">\
-                                <h4 className="font-black text-blue-600 text-xs uppercase mb-2">1.1 Finalit\'e0 del curricolo</h4>\
-                                <ul className="text-sm text-slate-600 space-y-2 list-disc pl-4">\
-                                    <li>Promuovere lo sviluppo della cittadinanza digitale come competenza chiave europea.</li>\
-                                    <li>Integrare competenze tecnologiche, pensiero critico e responsabilit\'e0 etico-civile.</li>\
-                                    <li>Sostenere l'uso consapevole, sicuro e creativo delle tecnologie nei contesti di studio e vita.</li>\
-                                </ul>\
-                            </div>\
-                            <div className="grid grid-cols-2 gap-4">\
-                                <div className="p-6 bg-white rounded-3xl shadow-sm border border-slate-100">\
-                                    <h4 className="font-black text-blue-600 text-xs uppercase mb-2">1.2 Principi pedagogici</h4>\
-                                    <ul className="text-xs text-slate-600 space-y-2 list-disc pl-4">\
-                                        <li>Centralit\'e0 del metodo scientifico.</li>\
-                                        <li>Apprendimento attivo e situato (problem solving, project work).</li>\
-                                        <li>Interdisciplinarit\'e0 e trasversalit\'e0.</li>\
-                                        <li>Inclusione e personalizzazione.</li>\
-                                    </ul>\
-                                </div>\
-                                <div className="p-6 bg-slate-900 text-white rounded-3xl shadow-sm border border-slate-100">\
-                                    <h4 className="font-black text-orange-500 text-xs uppercase mb-2">1.3 Struttura competenze</h4>\
-                                    <p className="text-xs opacity-80">Riferimento alle Competenze 10, 11, 12 dell'Educazione Civica. Declinazione in traguardi di uscita e livelli di padronanza: Iniziale, Base, Intermedio, Avanzato.</p>\
-                                </div>\
-                            </div>\
-                        </div>\
-                    );\
-                    case 3: return (\
-                        <div className="space-y-6">\
-                            <SectionHeader num="1.4-1.6" title="Progressione e Metodi" />\
-                            <div className="p-6 bg-white rounded-3xl border border-slate-100 shadow-sm">\
-                                <h4 className="font-black text-blue-600 text-xs uppercase mb-2">1.4 Progressione didattica</h4>\
-                                <p className="text-sm text-slate-600 mb-4">Il curricolo prevede una progressione coerente con i livelli DigComp:</p>\
-                                <div className="space-y-2">\
-                                    <div className="p-3 bg-slate-50 rounded-xl text-xs"><strong>Biennio:</strong> Alfabetizzazione guidata e sviluppo consapevolezza (Basic \uc0\u8594  Intermediate).</div>\
-                                    <div className="p-3 bg-slate-50 rounded-xl text-xs"><strong>Triennio:</strong> Autonomia, valutazione critica e responsabilit\'e0 (Intermediate \uc0\u8594  Advanced).</div>\
-                                </div>\
-                            </div>\
-                            <div className="grid grid-cols-2 gap-4">\
-                                <div className="p-6 bg-blue-50 rounded-3xl">\
-                                    <h4 className="font-black text-blue-600 text-xs uppercase mb-2">1.5 Metodologie didattiche</h4>\
-                                    <ul className="text-[11px] text-slate-700 space-y-2 list-disc pl-4">\
-                                        <li>Compiti autentici e situazioni-problema</li>\
-                                        <li>Didattica laboratoriale e digitale</li>\
-                                        <li>Cooperative learning e peer education</li>\
-                                        <li>Uso consapevole di ambienti collaborativi</li>\
-                                    </ul>\
-                                </div>\
-                                <div className="p-6 bg-orange-50 rounded-3xl">\
-                                    <h4 className="font-black text-orange-600 text-xs uppercase mb-2">1.6 Strumenti e ambienti</h4>\
-                                    <ul className="text-[11px] text-slate-700 space-y-2 list-disc pl-4">\
-                                        <li>Piattaforme (LMS, cloud collaborativi)</li>\
-                                        <li>Strumenti di ricerca e analisi dati</li>\
-                                        <li>Creazione di contenuti multimediali</li>\
-                                        <li>Banche dati e motori di ricerca</li>\
-                                    </ul>\
-                                </div>\
-                            </div>\
-                        </div>\
-                    );\
-                    case 4: return (\
-                        <div className="h-full flex flex-col">\
-                            <SectionHeader num="2" title="Framework DigComp 3.0" />\
-                            <div className="p-8 bg-blue-600 text-white rounded-[3rem] shadow-xl mb-6">\
-                                <p className="text-sm leading-relaxed mb-4">Il curricolo del Liceo Volterra \'e8 interamente mappato sulle 5 aree del Framework Europeo DigComp 3.0, garantendo standardizzazione e trasferibilit\'e0 delle competenze digitali acquisite.</p>\
-                            </div>\
-                            <div className="grid grid-cols-1 gap-2 overflow-y-auto pr-2 custom-scrollbar">\
-                                \{[\
-                                    \{ t: "1. Alfabetizzazione su informazioni e dati", i: "search" \}, \
-                                    \{ t: "2. Comunicazione e collaborazione", i: "message-square" \}, \
-                                    \{ t: "3. Creazione di contenuti digitali", i: "pen-tool" \}, \
-                                    \{ t: "4. Sicurezza, benessere e sostenibilit\'e0", i: "shield-check" \}, \
-                                    \{ t: "5. Risoluzione dei problemi", i: "wrench" \}\
-                                ].map((area, i) => (\
-                                    <div key=\{i\} className="p-4 bg-white rounded-2xl border border-slate-100 flex items-center gap-4">\
-                                        <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center font-black text-blue-600"><Icon name=\{area.i\} size=\{18\} /></div>\
-                                        <span className="text-xs font-bold text-slate-700">\{area.t\}</span>\
-                                    </div>\
-                                ))\}\
-                            </div>\
-                        </div>\
-                    );\
-                    case 5: return (\
-                        <div className="h-full flex flex-col">\
-                            <SectionHeader num="3" title="Intelligenza Artificiale" />\
-                            <div className="p-8 bg-white border border-slate-100 rounded-[3rem] space-y-6 shadow-sm">\
-                                <p className="text-sm font-bold text-slate-900 border-l-4 border-orange-500 pl-4">L'IA non \'e8 trattata come disciplina isolata, ma come dimensione trasversale da integrare organicamente in tutte le aree del DigComp 3.0 e in tutte le discipline.</p>\
-                                \
-                                <div className="grid grid-cols-2 gap-6 mt-6">\
-                                    <div className="flex flex-col gap-3">\
-                                        <div className="p-3 bg-orange-500 text-white rounded-2xl w-10 h-10 flex items-center justify-center"><Icon name="cpu" /></div>\
-                                        <h4 className="font-bold text-slate-900 uppercase text-[10px]">Consapevolezza e Limiti</h4>\
-                                        <p className="text-[11px] text-slate-600">Comprendere i modelli algoritmici, riconoscere mis- e dis-informazione, e analizzare i bias presenti nei dataset e nell'addestramento dei modelli.</p>\
-                                    </div>\
-                                    <div className="flex flex-col gap-3">\
-                                        <div className="p-3 bg-blue-500 text-white rounded-2xl w-10 h-10 flex items-center justify-center"><Icon name="eye" /></div>\
-                                        <h4 className="font-bold text-slate-900 uppercase text-[10px]">Supervisione e Trasparenza</h4>\
-                                        <p className="text-[11px] text-slate-600">Supervisione umana (Human-in-the-loop) e dichiarazione etica dell'uso di strumenti IA nella creazione di contenuti e compiti assegnati.</p>\
-                                    </div>\
-                                </div>\
-                            </div>\
-                        </div>\
-                    );\
-                    case 6: return (\
-                        <div className="space-y-4 overflow-y-auto pr-2 custom-scrollbar">\
-                            <SectionHeader num="4.1-4.3" title="Struttura e Traguardi" />\
-                            <div className="p-6 bg-blue-50 border-l-4 border-blue-500 rounded-r-3xl">\
-                                <h4 className="font-black text-blue-700 text-xs uppercase mb-2 flex items-center gap-2"><Icon name="search" size=\{14\} /> C10: Accesso critico alle fonti</h4>\
-                                <ul className="text-[11px] text-slate-700 space-y-1">\
-                                    <li><strong>T 10.1 Validazione:</strong> Fonti e dati (metodo scientifico e IA).</li>\
-                                    <li><strong>T 10.2 Modelli Algoritmici:</strong> Open data e bias nei modelli.</li>\
-                                    <li><strong>T 10.3 Produzione Responsabile:</strong> Copyright ed etica.</li>\
-                                </ul>\
-                            </div>\
-                            <div className="p-6 bg-orange-50 border-l-4 border-orange-500 rounded-r-3xl">\
-                                <h4 className="font-black text-orange-700 text-xs uppercase mb-2 flex items-center gap-2"><Icon name="users" size=\{14\} /> C11: Comunicazione e cooperazione</h4>\
-                                <ul className="text-[11px] text-slate-700 space-y-1">\
-                                    <li><strong>T 11.1 Adeguatezza:</strong> Contestualizzazione e netiquette.</li>\
-                                    <li><strong>T 11.2 Argomentazione:</strong> Dati affidabili contro disinformazione.</li>\
-                                    <li><strong>T 11.3 Collaborazione:</strong> Costruzione condivisa (cloud/partecipazione).</li>\
-                                </ul>\
-                            </div>\
-                            <div className="p-6 bg-slate-900 border-l-4 border-slate-500 rounded-r-3xl">\
-                                <h4 className="font-black text-white text-xs uppercase mb-2 flex items-center gap-2"><Icon name="shield-check" size=\{14\} /> C12: Sicurezza, Identit\'e0, Benessere</h4>\
-                                <ul className="text-[11px] text-slate-300 space-y-1">\
-                                    <li><strong>T 12.1 Identit\'e0:</strong> Privacy, GDPR e web reputation.</li>\
-                                    <li><strong>T 12.2 Sicurezza:</strong> Valutazione rischio e cybersecurity.</li>\
-                                    <li><strong>T 12.3 Benessere:</strong> Impatto psicofisico e sostenibilit\'e0 ambientale.</li>\
-                                </ul>\
-                            </div>\
-                        </div>\
-                    );\
-                    case 7: return (\
-                        <div className="space-y-6 overflow-y-auto pr-2 custom-scrollbar">\
-                            <SectionHeader num="4.4" title="Integrazione Discipline" />\
-                            <div className="p-6 bg-white rounded-3xl shadow-sm border border-slate-100">\
-                                <h4 className="font-black text-blue-600 text-xs uppercase mb-2">Ruolo dei Dipartimenti</h4>\
-                                <p className="text-sm text-slate-600 mb-4">L'insegnamento della cittadinanza digitale non \'e8 demandato a una singola materia, ma \'e8 trasversale. Ogni dipartimento disciplinare concorre declinando i traguardi nel proprio ambito epistemologico.</p>\
-                                \
-                                <div className="space-y-3">\
-                                    <div className="p-3 bg-slate-50 rounded-xl text-xs"><strong className="text-slate-900">Area Umanistica:</strong> Analisi del linguaggio, argomentazione, etica, diritto e storia delle tecnologie.</div>\
-                                    <div className="p-3 bg-slate-50 rounded-xl text-xs"><strong className="text-slate-900">Area Scientifica:</strong> Analisi dati (data literacy), comprensione modelli matematici, validazione fonti empiriche, impatto ambientale.</div>\
-                                    <div className="p-3 bg-slate-50 rounded-xl text-xs"><strong className="text-slate-900">Lingue straniere:</strong> Comunicazione interculturale digitale, uso critico traduttori IA.</div>\
-                                </div>\
-                            </div>\
-                        </div>\
-                    );\
-                    case 8: return (\
-                        <div className="h-full flex flex-col">\
-                            <SectionHeader num="5" title="Progressione Verticale" />\
-                            <div className="grid grid-cols-2 gap-4 mb-6">\
-                                <div className="p-6 bg-orange-50 rounded-3xl border border-orange-100">\
-                                    <h4 className="font-black text-orange-600 text-xs uppercase mb-2">5.1 Biennio</h4>\
-                                    <p className="text-xs text-slate-600 mb-2"><strong>Livelli:</strong> Iniziale \uc0\u8594  Base \u8594  Intermedio</p>\
-                                    <p className="text-[10px] text-slate-600 leading-relaxed">Fase di <em>Applicazione guidata, riconoscimento, consapevolezza iniziale</em>. Riconoscere fonti affidabili, usare strumenti digitali base e comprendere i rischi online primari.</p>\
-                                </div>\
-                                <div className="p-6 bg-blue-50 rounded-3xl border border-blue-100">\
-                                    <h4 className="font-black text-blue-600 text-xs uppercase mb-2">5.2 Triennio</h4>\
-                                    <p className="text-xs text-slate-600 mb-2"><strong>Livelli:</strong> Base \uc0\u8594  Intermedio \u8594  Avanzato</p>\
-                                    <p className="text-[10px] text-slate-600 leading-relaxed">Fase di <em>Autonomia, valutazione critica, responsabilit\'e0 etica</em>. Uso autonomo di strumenti complessi, consapevolezza dei bias IA e gestione della web reputation.</p>\
-                                </div>\
-                            </div>\
-                            <div className="p-6 bg-slate-900 text-white rounded-3xl mt-auto">\
-                                <h4 className="font-black text-white text-xs uppercase mb-2">Livello Atteso in Uscita (V Anno)</h4>\
-                                <ul className="text-xs space-y-2 opacity-90">\
-                                    <li><strong className="text-orange-400">Advanced:</strong> Per i traguardi fondamentali C10 e C11.</li>\
-                                    <li><strong className="text-orange-400">Intermediate/Advanced:</strong> Per C12 (sicurezza, benessere e sostenibilit\'e0).</li>\
-                                </ul>\
-                            </div>\
-                        </div>\
-                    );\
-                    case 9: return renderRubrica("Area 1 - Informazioni e Dati (C10)", rubricheData.C10);\
-                    case 10: return renderRubrica("Area 2 - Comunicazione (C11)", rubricheData.C11);\
-                    case 11: return renderRubrica("Area 4 - Sicurezza (C12)", rubricheData.C12);\
-                    case 12: return (\
-                        <div className="h-full flex flex-col bg-white rounded-[3rem] shadow-sm border border-slate-100 p-8 overflow-hidden">\
-                            <div className="shrink-0">\
-                                <SectionHeader num="7" title="Laboratorio Competenze \uc0\u10024 " />\
-                                <div className="grid grid-cols-2 gap-4 mb-6">\
-                                    <div className="space-y-2">\
-                                        <label className="text-[9px] font-black uppercase text-slate-400 px-2">Grado</label>\
-                                        <div className="flex gap-2">\
-                                            \{['Biennio','Triennio'].map(l=>(<button key=\{l\} onClick=\{()=>setSelectedLevel(l)\} className=\{`flex-1 py-3 rounded-xl font-black text-[10px] border-2 $\{selectedLevel===l?'bg-slate-900 text-white border-slate-900':'bg-slate-50 text-slate-400 border-transparent hover:bg-slate-100'\}`\}>\{l\}</button>))\}\
-                                        </div>\
-                                    </div>\
-                                    <div className="space-y-2">\
-                                        <label className="text-[9px] font-black uppercase text-slate-400 px-2">Disciplina</label>\
-                                        <input type="text" placeholder="Es. Matematica..." value=\{selectedDiscipline\} onChange=\{(e)=>setSelectedDiscipline(e.target.value)\} className="w-full py-3 px-4 rounded-xl bg-slate-50 border-2 border-transparent focus:border-blue-500 outline-none font-bold text-xs" />\
-                                    </div>\
-                                </div>\
-                            </div>\
-                            <div className="flex-1 overflow-y-auto pr-2 space-y-2 custom-scrollbar mb-4">\
-                                \{learningOutcomes.map((o)=>(\
-                                    <div key=\{o.id\} onClick=\{()=>toggleOutcome(o)\} className=\{`p-4 rounded-2xl border-2 cursor-pointer flex gap-4 items-center $\{selectedOutcomes.find(so=>so.id===o.id)?'border-orange-500 bg-orange-50 shadow-sm translate-x-1':'border-slate-50 bg-slate-50 hover:border-slate-100'\}`\}>\
-                                        <div className=\{`w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-black text-[10px] $\{selectedOutcomes.find(so=>so.id===o.id)?'bg-orange-500 text-white':'bg-white text-slate-400'\}`\}>\
-                                            \{o.id\}\
-                                        </div>\
-                                        <div className="text-[10px] leading-tight font-medium text-slate-600">\
-                                            <span className="font-black text-slate-900 uppercase text-[8px] block">\{o.area\}</span>\
-                                            \{o.text\}\
-                                        </div>\
-                                    </div>\
-                                ))\}\
-                            </div>\
-                            <div className="shrink-0 p-4 bg-slate-900 rounded-3xl flex items-center justify-between text-white">\
-                                <div className="text-xs font-bold opacity-60">Selezionati: \{selectedOutcomes.length\}/2</div>\
-                                <button disabled=\{selectedOutcomes.length===0||!selectedLevel||!selectedDiscipline\} onClick=\{handleGenerateActivity\} className=\{`px-6 py-2 rounded-xl font-black uppercase text-[10px] flex items-center gap-2 transition-all $\{selectedOutcomes.length===0||!selectedLevel||!selectedDiscipline?'bg-white/10 text-white/10':'bg-orange-500 text-white pulse-btn hover:bg-orange-600'\}`\}>Progetta con IA \uc0\u10024 </button>\
-                            </div>\
-                        </div>\
-                    );\
-                    case 13: return (\
-                        <div className="h-full flex flex-col justify-center items-center text-center p-8">\
-                            <SectionHeader num="8-9" title="Valutazione e Monitoraggio" />\
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 w-full max-w-2xl">\
-                                <div className="p-8 bg-white rounded-3xl border border-slate-100 shadow-sm text-left">\
-                                    <Icon name="clipboard-check" className="text-blue-500 mb-4" size=\{24\} />\
-                                    <h4 className="font-bold text-sm mb-2 text-slate-900">8. Modalit\'e0 di valutazione</h4>\
-                                    <p className="text-xs text-slate-600 mb-4">Integrata nell'Educazione Civica. Basata su osservazione, compiti autentici, portfolio digitale e peer assessment.</p>\
-                                    <ul className="text-[10px] text-slate-500 list-disc pl-4 space-y-1">\
-                                        <li>Formativa (in itinere)</li>\
-                                        <li>Sommativa (a conclusione)</li>\
-                                        <li>Orientata allo sviluppo</li>\
-                                    </ul>\
-                                </div>\
-                                <div className="p-8 bg-white rounded-3xl border border-slate-100 shadow-sm text-left">\
-                                    <Icon name="refresh-ccw" className="text-orange-500 mb-4" size=\{24\} />\
-                                    <h4 className="font-bold text-sm mb-2 text-slate-900">9. Monitoraggio</h4>\
-                                    <p className="text-xs text-slate-600 mb-4">Revisione periodica basata sugli esiti, il confronto nei Consigli di Classe e i feedback.</p>\
-                                    <ul className="text-[10px] text-slate-500 list-disc pl-4 space-y-1">\
-                                        <li>Evoluzione tecnologica</li>\
-                                        <li>Aggiornamenti DigComp</li>\
-                                        <li>Evidenze dalla pratica</li>\
-                                    </ul>\
-                                </div>\
-                            </div>\
-                        </div>\
-                    );\
-                    case 14: return (\
-                        <div className="h-full flex flex-col justify-center items-center text-center p-8">\
-                            <div className="mb-8 p-4 bg-blue-50 text-blue-600 rounded-full"><Icon name="download-cloud" size=\{48\} /></div>\
-                            <SectionHeader num="10" title="Esportazione PTOF" />\
-                            <p className="text-sm text-slate-500 max-w-md mb-8">Scarica la versione ufficiale del Curricolo di Cittadinanza Digitale del Liceo Volterra per allegarla al documento PTOF.</p>\
-                            <div className="flex gap-4">\
-                                <button onClick=\{()=>window.print()\} className="px-8 py-4 bg-slate-900 text-white rounded-2xl font-black uppercase text-xs flex items-center gap-2 hover:bg-blue-600 transition-colors">Stampa PDF <Icon name="printer" /></button>\
-                                <button className="px-8 py-4 bg-orange-500 text-white rounded-2xl font-black uppercase text-xs flex items-center gap-2 shadow-lg hover:bg-orange-600 transition-colors">Genera Word <Icon name="file-text" /></button>\
-                            </div>\
-                        </div>\
-                    );\
-                    default: return (<div className="flex-1 flex flex-col justify-center items-center text-slate-300"><Icon name="loader-2" className="animate-spin mb-4" size=\{48\} /><p className="font-black uppercase text-[10px]">Caricamento in corso...</p></div>);\
-                \}\
-            \};\
-\
-            return (\
-                <div className="min-h-screen flex items-center justify-center p-4">\
-                    \{/* Modal IA */\}\
-                    \{isModalOpen && (\
-                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 p-6 backdrop-blur-sm">\
-                            <div className="bg-white w-full max-w-3xl rounded-[3rem] shadow-2xl flex flex-col max-h-[90%] border-8 border-white overflow-hidden">\
-                                <div className="bg-slate-900 p-6 text-white flex justify-between items-center shrink-0">\
-                                    <h3 className="font-black text-lg uppercase flex items-center gap-2"><Icon name="sparkles" className="text-orange-500" /> \{modalContent.title\}</h3>\
-                                    <button onClick=\{()=>setIsModalOpen(false)\} className="hover:rotate-90 transition-transform"><Icon name="x-circle" /></button>\
-                                </div>\
-                                <div className="flex-1 overflow-y-auto p-10 text-sm leading-relaxed text-slate-700 whitespace-pre-wrap">\{modalContent.body\}</div>\
-                                <div className="p-6 border-t border-slate-100 flex justify-end shrink-0"><button onClick=\{()=>setIsModalOpen(false)\} className="bg-slate-900 text-white px-8 py-3 rounded-2xl font-black uppercase text-xs hover:bg-blue-600 transition-colors">Chiudi</button></div>\
-                            </div>\
-                        </div>\
-                    )\}\
-\
-                    \{aiLoading && (<div className="fixed inset-0 z-[60] flex items-center justify-center bg-white/90 backdrop-blur-md"><div className="flex flex-col items-center gap-6"><div className="w-16 h-16 border-4 border-blue-600 border-t-orange-500 rounded-full animate-spin"></div><p className="font-black text-slate-900 uppercase text-xs animate-pulse tracking-widest">Generazione in corso...</p></div></div>)\}\
-\
-                    <div className="w-full max-w-6xl bg-white rounded-[4rem] shadow-2xl overflow-hidden flex flex-col md:flex-row h-[850px] border-8 border-white relative shadow-slate-200">\
-                        \{/* Sidebar */\}\
-                        <div className="no-print hidden md:flex w-24 bg-slate-900 flex-col items-center py-12 justify-between shrink-0">\
-                            <Icon name="laptop" size=\{32\} className="text-white/20"/>\
-                            <div className="flex flex-col gap-8 items-center">\
-                                <button className="text-white text-[10px] font-black uppercase tracking-[0.3em] rotate-[-90deg] whitespace-nowrap mb-12 opacity-60 hover:opacity-100 transition-all" onClick=\{()=>goToPage(1)\}>Indice PTOF</button>\
-                                <div className="w-1 bg-white/10 h-40 rounded-full relative">\
-                                    <div className="absolute top-0 left-0 w-full bg-orange-500 rounded-full transition-all duration-500 shadow-[0_0_15px_rgba(249,115,22,0.5)]" style=\{\{height:`$\{((currentPage+1)/totalPages)*100\}%`\}\}/>\
-                                </div>\
-                            </div>\
-                            <div className="flex flex-col gap-4">\
-                                <button onClick=\{()=>goToPage(12)\} className="text-orange-500 hover:scale-125 transition-all"><Icon name="zap" size=\{28\}/></button>\
-                                <button onClick=\{()=>window.print()\} className="text-blue-400 hover:scale-125 transition-all"><Icon name="printer" size=\{24\}/></button>\
-                            </div>\
-                        </div>\
-\
-                        \{/* Main Content */\}\
-                        <div className="flex-1 flex flex-col bg-slate-50 overflow-hidden">\
-                            <div className="no-print h-1.5 bg-slate-200 w-full shrink-0"><div className="h-full bg-blue-600 transition-all duration-500" style=\{\{width:`$\{((currentPage+1)/totalPages)*100\}%`\}\}/></div>\
-                            <div id="ebook-content-area" className="flex-1 overflow-y-auto p-8 md:p-16 custom-scrollbar flex flex-col">\{renderPage()\}</div>\
-                            \
-                            \{/* Navigation Footer */\}\
-                            <div className="no-print h-24 border-t border-slate-100 flex items-center justify-between px-12 bg-white shrink-0">\
-                                <button onClick=\{prevPage\} disabled=\{currentPage===0\} className="flex items-center gap-3 text-xs font-black uppercase text-slate-900 disabled:opacity-10 hover:text-blue-600 transition-colors"><Icon name="chevron-left" strokeWidth=\{3\}/> Indietro</button>\
-                                <div className="flex flex-col items-center"><span className="text-[9px] font-black text-slate-300 uppercase tracking-[0.2em] mb-1">Pagina</span><span className="text-sm font-black text-slate-900">\{currentPage+1\} / \{totalPages\}</span></div>\
-                                <button onClick=\{nextPage\} disabled=\{currentPage===totalPages-1\} className="flex items-center gap-3 text-xs font-black uppercase text-slate-900 disabled:opacity-10 hover:text-blue-600 transition-colors">Avanti <Icon name="chevron-right" strokeWidth=\{3\}/></button>\
-                            </div>\
-                        </div>\
-                    </div>\
-                </div>\
-            );\
-        \};\
-\
-        const root = ReactDOM.createRoot(document.getElementById('root'));\
-        root.render(<App />);\
-    </script>\
-</body>\
-</html>}
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const Icon = ({ name, size = 18, className = "" }) => {
+            const containerRef = useRef(null);
+            useEffect(() => {
+                if (!containerRef.current || !window.lucide || !name) return;
+                containerRef.current.innerHTML = '';
+                const i = document.createElement('i');
+                i.setAttribute('data-lucide', name);
+                containerRef.current.appendChild(i);
+                window.lucide.createIcons({ root: containerRef.current, attrs: { width: size, height: size } });
+            }, [name, size]);
+            return <span ref={containerRef} className={`inline-flex items-center justify-center ${className}`}></span>;
+        };
+
+        const App = () => {
+            const [currentPage, setCurrentPage] = useState(0);
+            const [aiLoading, setAiLoading] = useState(false);
+            const [isModalOpen, setIsModalOpen] = useState(false);
+            const [modalContent, setModalContent] = useState({ title: '', body: '' });
+            const [selectedOutcomes, setSelectedOutcomes] = useState([]);
+            const [selectedLevel, setSelectedLevel] = useState('');
+            const [selectedDiscipline, setSelectedDiscipline] = useState('');
+
+            const totalPages = 15;
+            const apiKey = ""; // Inserire API Key per IA
+
+            const nextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1));
+            const prevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 0));
+            const goToPage = (pageIndex) => setCurrentPage(pageIndex);
+
+            const learningOutcomes = [
+                { area: "Area 1: Informazioni e dati", id: "1.1", text: "Articolare i bisogni informativi, cercare dati e informazioni.", icon: "search" },
+                { area: "Area 1: Informazioni e dati", id: "1.2", text: "Valutare criticamente l'attendibilità delle fonti.", icon: "check-circle" },
+                { area: "Area 2: Comunicazione", id: "2.1", text: "Interagire attraverso tecnologie digitali.", icon: "message-square" },
+                { area: "Area 2: Comunicazione", id: "2.3", text: "Esercitare la cittadinanza attraverso servizi digitali.", icon: "globe" },
+                { area: "Area 3: Creazione contenuti", id: "3.1", text: "Sviluppare e gestire contenuti digitali.", icon: "pen-tool" },
+                { area: "Area 4: Sicurezza", id: "4.1", text: "Proteggere dispositivi e contenuti (Cybersecurity).", icon: "lock" },
+                { area: "Area 4: Sicurezza", id: "4.2", text: "Protezione dei dati personali e della privacy (GDPR).", icon: "shield" },
+                { area: "Area 4: Benessere", id: "4.3", text: "Tutelare la salute e il benessere (Cyberbullismo).", icon: "activity" },
+                { area: "Area 4: Sostenibilità", id: "4.4", text: "Comprendere l'impatto ambientale delle tecnologie.", icon: "leaf" },
+                { area: "Area 5: Problem Solving", id: "5.1", text: "Risolvere problemi tecnici.", icon: "wrench" },
+                { area: "Area 5: Problem Solving", id: "5.2", text: "Individuare bisogni e risposte tecnologiche.", icon: "target" },
+                { area: "Area 5: Problem Solving", id: "5.3", text: "Usare tecnologie in modo creativo.", icon: "zap" }
+            ];
+
+            const rubricheData = {
+                C10: [
+                    { id: "10.1", titolo: "Validazione epistemologica", livelli: ["Ricerca poco mirata; non distingue fonti affidabili.", "Riconosce fonti attendibili con supporto.", "Verifica l'attendibilità e distingue fatti da opinioni.", "Valida dataset complessi applicando il metodo scientifico e riconoscendo bias."] },
+                    { id: "10.2", titolo: "Dati e algoritmi", livelli: ["Legge grafici con difficoltà.", "Interpreta grafici e dataset semplici.", "Analizza dataset distinguendo dato e interpretazione.", "Riconosce limiti e bias nei modelli algoritmici."] },
+                    { id: "10.3", titolo: "Produzione responsabile", livelli: ["Produce contenuti semplici senza citare fonti.", "Cita le fonti principali e rispetta il copyright.", "Rielabora informazioni integrando fonti diverse.", "Produce contenuti originali dichiarando l'uso di IA."] }
+                ],
+                C11: [
+                    { id: "11.1", titolo: "Adeguatezza comunicativa", livelli: ["Comunica senza considerare il contesto.", "Rispetta le regole base della netiquette.", "Adatta il registro al contesto e ai destinatari.", "Gestisce la comunicazione pubblica con rigore etico."] },
+                    { id: "11.2", titolo: "Argomentazione e rigore", livelli: ["Espone opinioni senza fonti verificabili.", "Usa fonti suggerite per esporre idee.", "Costruisce argomentazioni basate su dati affidabili.", "Modera discussioni contrastando la polarizzazione."] }
+                ],
+                C12: [
+                    { id: "12.1", titolo: "Identità e dati", livelli: ["Scarsa consapevolezza dei dati personali.", "Usa impostazioni base di privacy.", "Riflette criticamente sull'impronta digitale.", "Analizza criticamente profilazione e web reputation."] },
+                    { id: "12.2", titolo: "Sicurezza e rischio", livelli: ["Non riconosce minacce digitali comuni.", "Riconosce minacce e applica misure semplici suggerite.", "Applica comportamenti sicuri in dispositivi differenti.", "Analizza situazioni di rischio e adotta strategie efficaci."] },
+                    { id: "12.3", titolo: "Benessere e sostenibilità", livelli: ["Non riconosce gli effetti dell'uso eccessivo.", "Riconosce comportamenti dannosi per salute e relazioni.", "Applica strategie di uso equilibrato.", "Analizza l'impatto ambientale e promuove pratiche sostenibili."] }
+                ]
+            };
+
+            const handleGenerateActivity = async () => {
+                if (selectedOutcomes.length === 0 || !selectedLevel || !selectedDiscipline) return;
+                setAiLoading(true);
+                const outcomesText = selectedOutcomes.map(o => `[${o.id}] ${o.text}`).join(", ");
+                const prompt = `Progetta un'attività didattica di 2 ore per il Liceo Scientifico (Target: ${selectedLevel}, Disciplina: ${selectedDiscipline}) focalizzata su: ${outcomesText}. Usa il metodo scientifico e fai riferimento al framework DigComp 3.0. Rispondi in italiano in formato Markdown.`;
+                try {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, { 
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' }, 
+                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) 
+                    });
+                    const result = await response.json();
+                    setModalContent({ title: `Laboratorio: ${selectedDiscipline}`, body: result.candidates?.[0]?.content?.parts?.[0]?.text });
+                    setIsModalOpen(true);
+                } catch (e) { 
+                    setModalContent({ title: "Errore", body: "Inserire una API Key valida nel codice sorgente." }); 
+                    setIsModalOpen(true); 
+                }
+                setAiLoading(false);
+            };
+
+            const toggleOutcome = (outcome) => {
+                if (selectedOutcomes.find(o => o.id === outcome.id)) {
+                    setSelectedOutcomes(selectedOutcomes.filter(o => o.id !== outcome.id));
+                } else if (selectedOutcomes.length < 2) {
+                    setSelectedOutcomes([...selectedOutcomes, outcome]);
+                }
+            };
+
+            const SectionHeader = ({ num, title }) => (
+                <div className="mb-6 shrink-0">
+                    <div className="flex items-center gap-2 mb-1">
+                        <div className="h-[2px] w-8 bg-blue-600"></div>
+                        <span className="text-[10px] font-bold text-blue-600 uppercase">Sezione {num}</span>
+                    </div>
+                    <h2 className="text-3xl font-black text-slate-900 uppercase leading-tight">{title}</h2>
+                </div>
+            );
+
+            const renderRubrica = (title, data) => (
+                <div className="flex-1 flex flex-col overflow-hidden">
+                    <h3 className="text-lg font-bold text-slate-700 mb-4 uppercase">{title}</h3>
+                    <div className="flex-1 overflow-auto rounded-3xl border border-slate-200 bg-white shadow-sm custom-scrollbar">
+                        <table className="w-full text-[11px] border-collapse">
+                            <thead className="sticky top-0 bg-slate-900 text-white">
+                                <tr>
+                                    <th className="p-4 text-left">Traguardo</th>
+                                    <th className="p-4 border-l border-white/10">Iniziale</th>
+                                    <th className="p-4 border-l border-white/10">Base</th>
+                                    <th className="p-4 border-l border-white/10">Intermedio</th>
+                                    <th className="p-4 border-l border-white/10">Avanzato</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 text-slate-600">
+                                {data.map((t, i) => (
+                                    <tr key={i} className="hover:bg-slate-50">
+                                        <td className="p-4 font-bold bg-slate-50 text-slate-900">
+                                            {t.id}<br />
+                                            <span className="text-[9px] uppercase opacity-50">{t.titolo}</span>
+                                        </td>
+                                        {t.livelli.map((l, j) => (
+                                            <td key={j} className="p-4 border-l border-slate-100">{l}</td>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            );
+
+            const renderPage = () => {
+                switch(currentPage) {
+                    case 0: return (
+                        <div className="flex-1 flex flex-col justify-center items-center text-center p-6">
+                            <div className="mb-8 p-4 bg-blue-50 text-blue-600 rounded-3xl">
+                                <Icon name="globe" size={48} />
+                            </div>
+                            <span className="text-sm font-black text-blue-600 uppercase tracking-widest">Liceo Scientifico Volterra</span>
+                            <h1 className="text-7xl font-black text-slate-900 leading-none mb-8">
+                                CURRICOLO DI<br />
+                                <span className="text-blue-600">CITTADINANZA<br />DIGITALE</span>
+                            </h1>
+                            <div className="w-32 h-2 bg-orange-500 rounded-full mb-12"></div>
+                            <p className="text-slate-400 font-bold max-w-sm uppercase">Documento Integrale per PTOF</p>
+                            <button onClick={nextPage} className="no-print bg-slate-900 text-white px-16 py-6 rounded-3xl font-black uppercase tracking-widest shadow-2xl hover:bg-blue-600 transition-all transform hover:-translate-y-1">
+                                Consulta ✨
+                            </button>
+                        </div>
+                    );
+                    case 1: return (
+                        <div className="h-full flex flex-col">
+                            <SectionHeader num="0" title="Indice del Curricolo" />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4 overflow-y-auto pr-2 custom-scrollbar">
+                                {[
+                                    {t:"1. Premessa Metodologica", p:2},
+                                    {t:"Progressione e Metodi (1.4-1.6)", p:3},
+                                    {t:"2. Framework DigComp 3.0", p:4},
+                                    {t:"3. Dimensione IA", p:5},
+                                    {t:"4. Struttura e Traguardi (C10-12)", p:6},
+                                    {t:"4.4 Integrazione Discipline", p:7},
+                                    {t:"5. Progressione Verticale", p:8},
+                                    {t:"6. Rubrica Valutazione C10", p:9},
+                                    {t:"6. Rubrica Valutazione C11", p:10},
+                                    {t:"6. Rubrica Valutazione C12", p:11},
+                                    {t:"7. Laboratorio Competenze", p:12},
+                                    {t:"8-9. Valutazione e Monitoraggio", p:13},
+                                    {t:"Esportazione Ufficiale", p:14}
+                                ].map((item, i) => (
+                                    <button key={i} onClick={() => goToPage(item.p)} className="text-left p-5 bg-white rounded-2xl border border-slate-100 hover:border-blue-500 hover:shadow-lg flex justify-between items-center group transition-all">
+                                        <span className="font-bold text-slate-700 text-xs group-hover:text-blue-600">{item.t}</span>
+                                        <Icon name="chevron-right" className="text-slate-200 group-hover:text-blue-500" />
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    );
+                    case 2: return (
+                        <div className="space-y-6 overflow-y-auto pr-2 custom-scrollbar">
+                            <SectionHeader num="1" title="Premessa Metodologica" />
+                            <div className="p-6 bg-white rounded-3xl shadow-sm border border-slate-100">
+                                <h4 className="font-black text-blue-600 text-xs uppercase mb-2">1.1 Finalità del curricolo</h4>
+                                <ul className="text-sm text-slate-600 space-y-2 list-disc pl-4">
+                                    <li>Promuovere lo sviluppo della cittadinanza digitale come competenza chiave europea.</li>
+                                    <li>Integrare competenze tecnologiche, pensiero critico e responsabilità etico-civile.</li>
+                                    <li>Sostenere l'uso consapevole, sicuro e creativo delle tecnologie nei contesti di studio e vita.</li>
+                                </ul>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="p-6 bg-white rounded-3xl shadow-sm border border-slate-100">
+                                    <h4 className="font-black text-blue-600 text-xs uppercase mb-2">1.2 Principi pedagogici</h4>
+                                    <ul className="text-xs text-slate-600 space-y-2 list-disc pl-4">
+                                        <li>Centralità del metodo scientifico.</li>
+                                        <li>Apprendimento attivo e situato (problem solving, project work).</li>
+                                        <li>Interdisciplinarità e trasversalità.</li>
+                                        <li>Inclusione e personalizzazione.</li>
+                                    </ul>
+                                </div>
+                                <div className="p-6 bg-slate-900 text-white rounded-3xl shadow-sm border border-slate-100">
+                                    <h4 className="font-black text-orange-500 text-xs uppercase mb-2">1.3 Struttura competenze</h4>
+                                    <p className="text-xs opacity-80">Riferimento alle Competenze 10, 11, 12 dell'Educazione Civica. Declinazione in traguardi di uscita e livelli di padronanza: Iniziale, Base, Intermedio, Avanzato.</p>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                    case 3: return (
+                        <div className="space-y-6">
+                            <SectionHeader num="1.4-1.6" title="Progressione e Metodi" />
+                            <div className="p-6 bg-white rounded-3xl border border-slate-100 shadow-sm">
+                                <h4 className="font-black text-blue-600 text-xs uppercase mb-2">1.4 Progressione didattica</h4>
+                                <p className="text-sm text-slate-600 mb-4">Il curricolo prevede una progressione coerente con i livelli DigComp:</p>
+                                <div className="space-y-2">
+                                    <div className="p-3 bg-slate-50 rounded-xl text-xs">
+                                        <strong>Biennio:</strong> Alfabetizzazione guidata e sviluppo consapevolezza (Basic → Intermediate).
+                                    </div>
+                                    <div className="p-3 bg-slate-50 rounded-xl text-xs">
+                                        <strong>Triennio:</strong> Autonomia, valutazione critica e responsabilità (Intermediate → Advanced).
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="p-6 bg-blue-50 rounded-3xl">
+                                    <h4 className="font-black text-blue-600 text-xs uppercase mb-2">1.5 Metodologie didattiche</h4>
+                                    <ul className="text-[11px] text-slate-700 space-y-2 list-disc pl-4">
+                                        <li>Compiti autentici e situazioni-problema</li>
+                                        <li>Didattica laboratoriale e digitale</li>
+                                        <li>Cooperative learning e peer education</li>
+                                        <li>Uso consapevole di ambienti collaborativi</li>
+                                    </ul>
+                                </div>
+                                <div className="p-6 bg-orange-50 rounded-3xl">
+                                    <h4 className="font-black text-orange-600 text-xs uppercase mb-2">1.6 Strumenti e ambienti</h4>
+                                    <ul className="text-[11px] text-slate-700 space-y-2 list-disc pl-4">
+                                        <li>Piattaforme (LMS, cloud collaborativi)</li>
+                                        <li>Strumenti di ricerca e analisi dati</li>
+                                        <li>Creazione di contenuti multimediali</li>
+                                        <li>Banche dati e motori di ricerca</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                    case 4: return (
+                        <div className="h-full flex flex-col">
+                            <SectionHeader num="2" title="Framework DigComp 3.0" />
+                            <div className="p-8 bg-blue-600 text-white rounded-[3rem] shadow-xl mb-6">
+                                <p className="text-sm leading-relaxed mb-4">Il curricolo del Liceo Volterra è interamente mappato sulle 5 aree del Framework Europeo DigComp 3.0, garantendo standardizzazione e trasferibilità delle competenze digitali acquisite.</p>
+                            </div>
+                            <div className="grid grid-cols-1 gap-2 overflow-y-auto pr-2 custom-scrollbar">
+                                {[
+                                    { t: "1. Alfabetizzazione su informazioni e dati", i: "search" }, 
+                                    { t: "2. Comunicazione e collaborazione", i: "message-square" }, 
+                                    { t: "3. Creazione di contenuti digitali", i: "pen-tool" }, 
+                                    { t: "4. Sicurezza, benessere e sostenibilità", i: "shield-check" }, 
+                                    { t: "5. Risoluzione dei problemi", i: "wrench" }
+                                ].map((area, i) => (
+                                    <div key={i} className="p-4 bg-white rounded-2xl border border-slate-100 flex items-center gap-4">
+                                        <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center font-black text-blue-600">
+                                            <Icon name={area.i} size={18} />
+                                        </div>
+                                        <span className="text-xs font-bold text-slate-700">{area.t}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    );
+                    case 5: return (
+                        <div className="h-full flex flex-col">
+                            <SectionHeader num="3" title="Intelligenza Artificiale" />
+                            <div className="p-8 bg-white border border-slate-100 rounded-[3rem] space-y-6 shadow-sm">
+                                <p className="text-sm font-bold text-slate-900 border-l-4 border-orange-500 pl-4">L'IA non è trattata come disciplina isolata, ma come dimensione trasversale da integrare organicamente in tutte le aree del DigComp 3.0 e in tutte le discipline.</p>
+                                <div className="grid grid-cols-2 gap-6 mt-6">
+                                    <div className="flex flex-col gap-3">
+                                        <div className="p-3 bg-orange-500 text-white rounded-2xl w-10 h-10 flex items-center justify-center"><Icon name="cpu" /></div>
+                                        <h4 className="font-bold text-slate-900 uppercase text-[10px]">Consapevolezza e Limiti</h4>
+                                        <p className="text-[11px] text-slate-600">Comprendere i modelli algoritmici, riconoscere mis- e dis-informazione, e analizzare i bias presenti nei dataset e nell'addestramento dei modelli.</p>
+                                    </div>
+                                    <div className="flex flex-col gap-3">
+                                        <div className="p-3 bg-blue-500 text-white rounded-2xl w-10 h-10 flex items-center justify-center"><Icon name="eye" /></div>
+                                        <h4 className="font-bold text-slate-900 uppercase text-[10px]">Supervisione e Trasparenza</h4>
+                                        <p className="text-[11px] text-slate-600">Supervisione umana (Human-in-the-loop) e dichiarazione etica dell'uso di strumenti IA nella creazione di contenuti e compiti assegnati.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                    case 6: return (
+                        <div className="space-y-4 overflow-y-auto pr-2 custom-scrollbar">
+                            <SectionHeader num="4.1-4.3" title="Struttura e Traguardi" />
+                            <div className="p-6 bg-blue-50 border-l-4 border-blue-500 rounded-r-3xl">
+                                <h4 className="font-black text-blue-700 text-xs uppercase mb-2 flex items-center gap-2"><Icon name="search" size={14} /> C10: Accesso critico alle fonti</h4>
+                                <ul className="text-[11px] text-slate-700 space-y-1">
+                                    <li><strong>T 10.1 Validazione:</strong> Fonti e dati (metodo scientifico e IA).</li>
+                                    <li><strong>T 10.2 Modelli Algoritmici:</strong> Open data e bias nei modelli.</li>
+                                    <li><strong>T 10.3 Produzione Responsabile:</strong> Copyright ed etica.</li>
+                                </ul>
+                            </div>
+                            <div className="p-6 bg-orange-50 border-l-4 border-orange-500 rounded-r-3xl">
+                                <h4 className="font-black text-orange-700 text-xs uppercase mb-2 flex items-center gap-2"><Icon name="users" size={14} /> C11: Comunicazione e cooperazione</h4>
+                                <ul className="text-[11px] text-slate-700 space-y-1">
+                                    <li><strong>T 11.1 Adeguatezza:</strong> Contestualizzazione e netiquette.</li>
+                                    <li><strong>T 11.2 Argomentazione:</strong> Dati affidabili contro disinformazione.</li>
+                                    <li><strong>T 11.3 Collaborazione:</strong> Costruzione condivisa (cloud/partecipazione).</li>
+                                </ul>
+                            </div>
+                            <div className="p-6 bg-slate-900 border-l-4 border-slate-500 rounded-r-3xl">
+                                <h4 className="font-black text-white text-xs uppercase mb-2 flex items-center gap-2"><Icon name="shield-check" size={14} /> C12: Sicurezza, Identità, Benessere</h4>
+                                <ul className="text-[11px] text-slate-300 space-y-1">
+                                    <li><strong>T 12.1 Identità:</strong> Privacy, GDPR e web reputation.</li>
+                                    <li><strong>T 12.2 Sicurezza:</strong> Valutazione rischio e cybersecurity.</li>
+                                    <li><strong>T 12.3 Benessere:</strong> Impatto psicofisico e sostenibilità ambientale.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    );
+                    case 7: return (
+                        <div className="space-y-6 overflow-y-auto pr-2 custom-scrollbar">
+                            <SectionHeader num="4.4" title="Integrazione Discipline" />
+                            <div className="p-6 bg-white rounded-3xl shadow-sm border border-slate-100">
+                                <h4 className="font-black text-blue-600 text-xs uppercase mb-2">Ruolo dei Dipartimenti</h4>
+                                <p className="text-sm text-slate-600 mb-4">L'insegnamento della cittadinanza digitale non è demandato a una singola materia, ma è trasversale. Ogni dipartimento disciplinare concorre declinando i traguardi nel proprio ambito epistemologico.</p>
+                                <div className="space-y-3">
+                                    <div className="p-3 bg-slate-50 rounded-xl text-xs"><strong className="text-slate-900">Area Umanistica:</strong> Analisi del linguaggio, argomentazione, etica, diritto e storia delle tecnologie.</div>
+                                    <div className="p-3 bg-slate-50 rounded-xl text-xs"><strong className="text-slate-900">Area Scientifica:</strong> Analisi dati (data literacy), comprensione modelli matematici, validazione fonti empiriche, impatto ambientale.</div>
+                                    <div className="p-3 bg-slate-50 rounded-xl text-xs"><strong className="text-slate-900">Lingue straniere:</strong> Comunicazione interculturale digitale, uso critico traduttori IA.</div>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                    case 8: return (
+                        <div className="h-full flex flex-col">
+                            <SectionHeader num="5" title="Progressione Verticale" />
+                            <div className="grid grid-cols-2 gap-4 mb-6">
+                                <div className="p-6 bg-orange-50 rounded-3xl border border-orange-100">
+                                    <h4 className="font-black text-orange-600 text-xs uppercase mb-2">5.1 Biennio</h4>
+                                    <p className="text-xs text-slate-600 mb-2"><strong>Livelli:</strong> Iniziale → Base → Intermedio</p>
+                                    <p className="text-[10px] text-slate-600 leading-relaxed">Fase di <em>Applicazione guidata, riconoscimento, consapevolezza iniziale</em>. Riconoscere fonti affidabili, usare strumenti digitali base e comprendere i rischi online primari.</p>
+                                </div>
+                                <div className="p-6 bg-blue-50 rounded-3xl border border-blue-100">
+                                    <h4 className="font-black text-blue-600 text-xs uppercase mb-2">5.2 Triennio</h4>
+                                    <p className="text-xs text-slate-600 mb-2"><strong>Livelli:</strong> Base → Intermedio → Avanzato</p>
+                                    <p className="text-[10px] text-slate-600 leading-relaxed">Fase di <em>Autonomia, valutazione critica, responsabilità etica</em>. Uso autonomo di strumenti complessi, consapevolezza dei bias IA e gestione della web reputation.</p>
+                                </div>
+                            </div>
+                            <div className="p-6 bg-slate-900 text-white rounded-3xl mt-auto">
+                                <h4 className="font-black text-white text-xs uppercase mb-2">Livello Atteso in Uscita (V Anno)</h4>
+                                <ul className="text-xs space-y-2 opacity-90 list-disc pl-4">
+                                    <li><strong className="text-orange-400">Advanced:</strong> Per i traguardi fondamentali C10 e C11.</li>
+                                    <li><strong className="text-orange-400">Intermediate/Advanced:</strong> Per C12 (sicurezza, benessere e sostenibilità).</li>
+                                </ul>
+                            </div>
+                        </div>
+                    );
+                    case 9: return renderRubrica("Area 1 - Informazioni e Dati (C10)", rubricheData.C10);
+                    case 10: return renderRubrica("Area 2 - Comunicazione (C11)", rubricheData.C11);
+                    case 11: return renderRubrica("Area 4 - Sicurezza (C12)", rubricheData.C12);
+                    case 12: return (
+                        <div className="h-full flex flex-col bg-white rounded-[3rem] shadow-sm border border-slate-100 p-8 overflow-hidden">
+                            <div className="shrink-0">
+                                <SectionHeader num="7" title="Laboratorio Competenze ✨" />
+                                <div className="grid grid-cols-2 gap-4 mb-6">
+                                    <div className="space-y-2">
+                                        <label className="text-[9px] font-black uppercase text-slate-400 px-2">Grado</label>
+                                        <div className="flex gap-2">
+                                            {['Biennio','Triennio'].map((l) => (
+                                                <button key={l} onClick={() => setSelectedLevel(l)} className={`flex-1 py-3 rounded-xl font-black text-[10px] border-2 ${selectedLevel===l ? 'bg-slate-900 text-white border-slate-900' : 'bg-slate-50 text-slate-400 border-transparent hover:bg-slate-100'}`}>
+                                                    {l}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[9px] font-black uppercase text-slate-400 px-2">Disciplina</label>
+                                        <input type="text" placeholder="Es. Matematica..." value={selectedDiscipline} onChange={(e) => setSelectedDiscipline(e.target.value)} className="w-full py-3 px-4 rounded-xl bg-slate-50 border-2 border-transparent focus:border-blue-500 outline-none font-bold text-xs" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex-1 overflow-y-auto pr-2 space-y-2 custom-scrollbar mb-4">
+                                {learningOutcomes.map((o) => (
+                                    <div key={o.id} onClick={() => toggleOutcome(o)} className={`p-4 rounded-2xl border-2 cursor-pointer flex gap-4 items-center ${selectedOutcomes.find(so=>so.id===o.id) ? 'border-orange-500 bg-orange-50 shadow-sm translate-x-1' : 'border-slate-50 bg-slate-50 hover:border-slate-100'}`}>
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-black text-[10px] ${selectedOutcomes.find(so=>so.id===o.id) ? 'bg-orange-500 text-white' : 'bg-white text-slate-400'}`}>
+                                            {o.id}
+                                        </div>
+                                        <div className="text-[10px] leading-tight font-medium text-slate-600">
+                                            <span className="font-black text-slate-900 uppercase text-[8px] block">{o.area}</span>
+                                            {o.text}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="shrink-0 p-4 bg-slate-900 rounded-3xl flex items-center justify-between text-white">
+                                <div className="text-xs font-bold opacity-60">Selezionati: {selectedOutcomes.length}/2</div>
+                                <button disabled={selectedOutcomes.length===0 || !selectedLevel || !selectedDiscipline} onClick={handleGenerateActivity} className={`px-6 py-2 rounded-xl font-black uppercase text-[10px] flex items-center gap-2 transition-all ${selectedOutcomes.length===0 || !selectedLevel || !selectedDiscipline ? 'bg-white/10 text-white/10' : 'bg-orange-500 text-white pulse-btn hover:bg-orange-600'}`}>
+                                    Progetta con IA ✨
+                                </button>
+                            </div>
+                        </div>
+                    );
+                    case 13: return (
+                        <div className="h-full flex flex-col justify-center items-center text-center p-8">
+                            <SectionHeader num="8-9" title="Valutazione e Monitoraggio" />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 w-full max-w-2xl">
+                                <div className="p-8 bg-white rounded-3xl border border-slate-100 shadow-sm text-left">
+                                    <Icon name="clipboard-check" className="text-blue-500 mb-4" size={24} />
+                                    <h4 className="font-bold text-sm mb-2 text-slate-900">8. Modalità di valutazione</h4>
+                                    <p className="text-xs text-slate-600 mb-4">Integrata nell'Educazione Civica. Basata su osservazione, compiti autentici, portfolio digitale e peer assessment.</p>
+                                    <ul className="text-[10px] text-slate-500 list-disc pl-4 space-y-1">
+                                        <li>Formativa (in itinere)</li>
+                                        <li>Sommativa (a conclusione)</li>
+                                        <li>Orientata allo sviluppo</li>
+                                    </ul>
+                                </div>
+                                <div className="p-8 bg-white rounded-3xl border border-slate-100 shadow-sm text-left">
+                                    <Icon name="refresh-ccw" className="text-orange-500 mb-4" size={24} />
+                                    <h4 className="font-bold text-sm mb-2 text-slate-900">9. Monitoraggio</h4>
+                                    <p className="text-xs text-slate-600 mb-4">Revisione periodica basata sugli esiti, il confronto nei Consigli di Classe e i feedback.</p>
+                                    <ul className="text-[10px] text-slate-500 list-disc pl-4 space-y-1">
+                                        <li>Evoluzione tecnologica</li>
+                                        <li>Aggiornamenti DigComp</li>
+                                        <li>Evidenze dalla pratica</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                    case 14: return (
+                        <div className="h-full flex flex-col justify-center items-center text-center p-8">
+                            <div className="mb-8 p-4 bg-blue-50 text-blue-600 rounded-full">
+                                <Icon name="download-cloud" size={48} />
+                            </div>
+                            <SectionHeader num="10" title="Esportazione PTOF" />
+                            <p className="text-sm text-slate-500 max-w-md mb-8">Scarica la versione ufficiale del Curricolo di Cittadinanza Digitale del Liceo Volterra per allegarla al documento PTOF.</p>
+                            <div className="flex gap-4">
+                                <button onClick={() => window.print()} className="px-8 py-4 bg-slate-900 text-white rounded-2xl font-black uppercase text-xs flex items-center gap-2 hover:bg-blue-600 transition-colors">
+                                    Stampa PDF <Icon name="printer" />
+                                </button>
+                                <button className="px-8 py-4 bg-orange-500 text-white rounded-2xl font-black uppercase text-xs flex items-center gap-2 shadow-lg hover:bg-orange-600 transition-colors">
+                                    Genera Word <Icon name="file-text" />
+                                </button>
+                            </div>
+                        </div>
+                    );
+                    default: return (
+                        <div className="flex-1 flex flex-col justify-center items-center text-slate-300">
+                            <Icon name="loader-2" className="animate-spin mb-4" size={48} />
+                            <p className="font-black uppercase text-[10px]">Caricamento in corso...</p>
+                        </div>
+                    );
+                }
+            };
+
+            return (
+                <div className="min-h-screen flex items-center justify-center p-4">
+                    {/* Modal IA */}
+                    {isModalOpen && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 p-6 backdrop-blur-sm">
+                            <div className="bg-white w-full max-w-3xl rounded-[3rem] shadow-2xl flex flex-col max-h-[90%] border-8 border-white overflow-hidden">
+                                <div className="bg-slate-900 p-6 text-white flex justify-between items-center shrink-0">
+                                    <h3 className="font-black text-lg uppercase flex items-center gap-2">
+                                        <Icon name="sparkles" className="text-orange-500" /> {modalContent.title}
+                                    </h3>
+                                    <button onClick={() => setIsModalOpen(false)} className="hover:rotate-90 transition-transform">
+                                        <Icon name="x-circle" />
+                                    </button>
+                                </div>
+                                <div className="flex-1 overflow-y-auto p-10 text-sm leading-relaxed text-slate-700 whitespace-pre-wrap">
+                                    {modalContent.body}
+                                </div>
+                                <div className="p-6 border-t border-slate-100 flex justify-end shrink-0">
+                                    <button onClick={() => setIsModalOpen(false)} className="bg-slate-900 text-white px-8 py-3 rounded-2xl font-black uppercase text-xs hover:bg-blue-600 transition-colors">
+                                        Chiudi
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {aiLoading && (
+                        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-white/90 backdrop-blur-md">
+                            <div className="flex flex-col items-center gap-6">
+                                <div className="w-16 h-16 border-4 border-blue-600 border-t-orange-500 rounded-full animate-spin"></div>
+                                <p className="font-black text-slate-900 uppercase text-xs animate-pulse tracking-widest">Generazione in corso...</p>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="w-full max-w-6xl bg-white rounded-[4rem] shadow-2xl overflow-hidden flex flex-col md:flex-row h-[850px] border-8 border-white relative shadow-slate-200">
+                        {/* Sidebar */}
+                        <div className="no-print hidden md:flex w-24 bg-slate-900 flex-col items-center py-12 justify-between shrink-0">
+                            <Icon name="laptop" size={32} className="text-white/20" />
+                            <div className="flex flex-col gap-8 items-center">
+                                <button className="text-white text-[10px] font-black uppercase tracking-[0.3em] rotate-[-90deg] whitespace-nowrap mb-12 opacity-60 hover:opacity-100 transition-all" onClick={() => goToPage(1)}>
+                                    Indice PTOF
+                                </button>
+                                <div className="w-1 bg-white/10 h-40 rounded-full relative">
+                                    <div className="absolute top-0 left-0 w-full bg-orange-500 rounded-full transition-all duration-500 shadow-[0_0_15px_rgba(249,115,22,0.5)]" style={{ height: `${((currentPage+1)/totalPages)*100}%` }}></div>
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-4">
+                                <button onClick={() => goToPage(12)} className="text-orange-500 hover:scale-125 transition-all">
+                                    <Icon name="zap" size={28} />
+                                </button>
+                                <button onClick={() => window.print()} className="text-blue-400 hover:scale-125 transition-all">
+                                    <Icon name="printer" size={24} />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Main Content */}
+                        <div className="flex-1 flex flex-col bg-slate-50 overflow-hidden">
+                            <div className="no-print h-1.5 bg-slate-200 w-full shrink-0">
+                                <div className="h-full bg-blue-600 transition-all duration-500" style={{ width: `${((currentPage+1)/totalPages)*100}%` }}></div>
+                            </div>
+                            
+                            <div id="ebook-content-area" className="flex-1 overflow-y-auto p-8 md:p-16 custom-scrollbar flex flex-col">
+                                {renderPage()}
+                            </div>
+                            
+                            {/* Navigation Footer */}
+                            <div className="no-print h-24 border-t border-slate-100 flex items-center justify-between px-12 bg-white shrink-0">
+                                <button onClick={prevPage} disabled={currentPage===0} className="flex items-center gap-3 text-xs font-black uppercase text-slate-900 disabled:opacity-10 hover:text-blue-600 transition-colors">
+                                    <Icon name="chevron-left" strokeWidth={3} /> Indietro
+                                </button>
+                                <div className="flex flex-col items-center">
+                                    <span className="text-[9px] font-black text-slate-300 uppercase tracking-[0.2em] mb-1">Pagina</span>
+                                    <span className="text-sm font-black text-slate-900">{currentPage+1} / {totalPages}</span>
+                                </div>
+                                <button onClick={nextPage} disabled={currentPage===totalPages-1} className="flex items-center gap-3 text-xs font-black uppercase text-slate-900 disabled:opacity-10 hover:text-blue-600 transition-colors">
+                                    Avanti <Icon name="chevron-right" strokeWidth={3} />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
