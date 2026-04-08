@@ -1,759 +1,305 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Curricolo Cittadinanza Digitale - Liceo Volterra</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; color: #1e293b; }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        @media print { 
-            .no-print { display: none !important; } 
-            .print-only { display: block !important; }
-            body { background-color: white; }
-            #ebook-content-area { overflow: visible !important; height: auto !important; }
-        }
-        .form-checkbox { width: 1rem; height: 1rem; border-radius: 0.25rem; border: 1px solid #cbd5e1; display: inline-block; vertical-align: middle; cursor: pointer; }
-        .form-line { border-bottom: 1px solid #cbd5e1; display: inline-block; width: 100%; min-height: 1.5rem; }
-    </style>
-</head>
-<body>
-    <div id="root"></div>
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  ChevronRight, 
+  ChevronLeft, 
+  Globe, 
+  Laptop, 
+  FileText, 
+  Printer, 
+  Zap, 
+  Info, 
+  ShieldCheck, 
+  Cpu, 
+  MessageSquare, 
+  Search,
+  BookOpen,
+  ClipboardCheck,
+  RefreshCcw
+} from 'lucide-react';
 
-        const Icon = ({ name, size = 18, className = "" }) => {
-            const containerRef = useRef(null);
-            useEffect(() => {
-                try {
-                    if (!containerRef.current || !window.lucide || !name) return;
-                    containerRef.current.innerHTML = '';
-                    const i = document.createElement('i');
-                    i.setAttribute('data-lucide', name);
-                    containerRef.current.appendChild(i);
-                    window.lucide.createIcons({ root: containerRef.current, attrs: { width: size, height: size } });
-                } catch (e) {
-                    console.error("Lucide Icon Error:", e);
-                }
-            }, [name, size]);
-            return <span ref={containerRef} className={`inline-flex items-center justify-center ${className}`}></span>;
-        };
+const App = () => {
+  const [currentPage, setCurrentPage] = useState(0);
+  const totalPages = 18;
 
-        const App = () => {
-            const [currentPage, setCurrentPage] = useState(0);
+  const nextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1));
+  const prevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 0));
+  const goToPage = (pageIndex) => setCurrentPage(pageIndex);
 
-            const totalPages = 18;
+  const rubricheData = {
+    C10: [
+      { id: "10.1", titolo: "Validazione epistemologica", livelli: ["Ricerca poco mirata; non distingue fonti.", "Riconosce fonti attendibili con supporto.", "Verifica l'attendibilità e distingue fatti da opinioni.", "Valida dataset complessi applicando il metodo scientifico e riconoscendo bias."] },
+      { id: "10.2", titolo: "Dati e modelli", livelli: ["Legge grafici con difficoltà.", "Interpreta grafici e dataset semplici.", "Analizza dataset distinguendo dato e interpretazione.", "Riconosce limiti e bias nei modelli algoritmici."] },
+      { id: "10.3", titolo: "Produzione responsabile", livelli: ["Produce contenuti semplici senza citare fonti.", "Cita le fonti principali e rispetta il copyright.", "Rielabora informazioni integrando fonti diverse.", "Produce contenuti originali dichiarando l'uso di IA."] }
+    ],
+    C11: [
+      { id: "11.1", titolo: "Adeguatezza comunicativa", livelli: ["Comunica senza considerare il contesto.", "Rispetta le regole base della netiquette.", "Adatta il registro al contesto e ai destinatari.", "Gestisce la comunicazione pubblica con rigore etico."] },
+      { id: "11.2", titolo: "Argomentazione razionale", livelli: ["Espone opinioni senza fonti verificabili.", "Usa fonti suggerite per esporre idee.", "Costruisce argomentazioni basate su dati affidabili.", "Modera discussioni contrastando la polarizzazione."] }
+    ],
+    C12: [
+      { id: "12.1", titolo: "Identità digitale e dati", livelli: ["Scarsa consapevolezza dei dati personali.", "Usa impostazioni base di privacy.", "Riflette criticamente sull'impronta digitale.", "Analizza criticamente profilazione e web reputation."] }
+    ]
+  };
 
-            const nextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1));
-            const prevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 0));
-            const goToPage = (pageIndex) => setCurrentPage(pageIndex);
+  const SectionHeader = ({ num, title }) => (
+    <div className="mb-6 shrink-0">
+      <div className="flex items-center gap-2 mb-1">
+        <div className="h-[2px] w-8 bg-blue-600"></div>
+        <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">Sezione {num}</span>
+      </div>
+      <h2 className="text-3xl font-black text-slate-900 uppercase leading-tight">{title}</h2>
+    </div>
+  );
 
-            const rubricheData = {
-                C10: [
-                    { id: "10.1", titolo: "Validazione epistemologica", livelli: [
-                        "Ricerca informazioni online in modo poco mirato e non distingue chiaramente tra fonti affidabili e non affidabili.", 
-                        "Ricerca informazioni pertinenti e riconosce alcune caratteristiche delle fonti attendibili con il supporto del docente.", 
-                        "Confronta fonti diverse, verifica l'attendibilità delle informazioni e distingue fatti, opinioni e interpretazioni.", 
-                        "Valida informazioni e dataset complessi applicando il metodo scientifico e riconoscendo fenomeni di disinformazione e bias algoritmici."
-                    ] },
-                    { id: "10.2", titolo: "Dati e modelli", livelli: [
-                        "Legge grafici o dati digitali con difficoltà, mostrando una visione frammentata delle informazioni.", 
-                        "Interpreta grafici e dataset semplici riconoscendo le informazioni principali fornite dal docente.", 
-                        "Analizza grafici e dataset distinguendo tra dato e interpretazione e individuando relazioni significative.", 
-                        "Analizza dataset complessi e riconosce limiti, distorsioni e bias nei modelli algoritmici, valutandone l'impatto."
-                    ] },
-                    { id: "10.3", titolo: "Produzione responsabile", livelli: [
-                        "Produce contenuti digitali semplici senza citare sempre le fonti utilizzate.", 
-                        "Produce contenuti citando le fonti principali e rispettando alcune regole di base del copyright.", 
-                        "Integra fonti diverse citandole correttamente e rielaborando le informazioni in modo coerente.", 
-                        "Produce contenuti originali e argomentati, dichiarando l'uso di IA e rispettando l'etica del copyright."
-                    ] }
-                ],
-                C11: [
-                    { id: "11.1", titolo: "Adeguatezza comunicativa", livelli: [
-                        "Comunica negli ambienti digitali senza considerare pienamente il contesto e i diversi destinatari.", 
-                        "Utilizza un linguaggio adeguato nei principali contesti digitali e rispetta le regole fondamentali della netiquette.", 
-                        "Adatta con consapevolezza il registro comunicativo al contesto e ai destinatari utilizzando modalità appropriate.", 
-                        "Gestisce consapevolmente la comunicazione pubblica e l'identità digitale con rigore etico."
-                    ] },
-                    { id: "11.2", titolo: "Argomentazione razionale", livelli: [
-                        "Espone opinioni e informazioni senza ricorrere a fonti verificabili.", 
-                        "Espone le proprie idee utilizzando alcune fonti di riferimento suggerite.", 
-                        "Costruisce argomentazioni coerenti utilizzando fonti affidabili e dati per sostenere la propria tesi.", 
-                        "Modera discussioni online riconoscendo disinformazione e polarizzazione, promuovendo il rigore comunicativo."
-                    ] },
-                    { id: "11.3", titolo: "Collaborazione digitale", livelli: [
-                        "Partecipa con difficoltà ad attività collaborative online e richiede guida costante.", 
-                        "Collabora in attività digitali guidate rispettando i ruoli assegnati e le consegne.", 
-                        "Collabora attivamente alla produzione di contenuti condivisi e alla gestione di ambienti cloud.", 
-                        "Coordina o facilita processi collaborativi digitali e la costruzione condivisa di conoscenza in contesti complessi."
-                    ] }
-                ],
-                C12: [
-                    { id: "12.1", titolo: "Identità digitale e dati", livelli: [
-                        "Ha scarsa consapevolezza della gestione dei propri dati personali online.", 
-                        "Comprende il concetto di privacy e utilizza alcune impostazioni di sicurezza base.", 
-                        "Gestisce con consapevolezza i propri dati personali e riflette criticamente sull'impronta digitale.", 
-                        "Analizza criticamente i fenomeni di profilazione, reputazione online e l'uso dei dati personali su larga scala."
-                    ] },
-                    { id: "12.2", titolo: "Sicurezza digitale", livelli: [
-                        "Non riconosce facilmente le minacce digitali comuni e i rischi della rete.", 
-                        "Riconosce alcune minacce digitali e applica semplici misure di protezione suggerite.", 
-                        "Applica autonomamente comportamenti sicuri nell'uso di dispositivi e servizi digitali differenti.", 
-                        "Analizza situazioni di rischio digitale e adotta strategie di sicurezza efficaci basate sull'analisi del rischio."
-                    ] },
-                    { id: "12.3", titolo: "Benessere e sostenibilità", livelli: [
-                        "Non sempre riconosce gli effetti dell'uso eccessivo o scorretto delle tecnologie.", 
-                        "Riconosce comportamenti digitali potenzialmente dannosi per la salute e le relazioni.", 
-                        "Applica strategie personali di uso equilibrato e consapevole delle tecnologie.", 
-                        "Analizza l'impatto ambientale delle tecnologie e promuove attivamente pratiche digitali sostenibili."
-                    ] }
-                ]
-            };
+  const renderRubrica = (title, data) => (
+    <div className="flex-1 flex flex-col overflow-hidden">
+      <h3 className="text-lg font-bold text-slate-700 mb-4 uppercase">{title}</h3>
+      <div className="flex-1 overflow-auto rounded-3xl border border-slate-200 bg-white shadow-sm custom-scrollbar">
+        <table className="w-full text-[11px] border-collapse">
+          <thead className="sticky top-0 bg-slate-900 text-white">
+            <tr>
+              <th className="p-4 text-left w-1/5">Traguardo</th>
+              <th className="p-4 border-l border-white/10 w-1/5">Iniziale</th>
+              <th className="p-4 border-l border-white/10 w-1/5">Base</th>
+              <th className="p-4 border-l border-white/10 w-1/5">Intermedio</th>
+              <th className="p-4 border-l border-white/10 w-1/5">Avanzato</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100 text-slate-600">
+            {data.map((t, i) => (
+              <tr key={i} className="hover:bg-slate-50">
+                <td className="p-4 font-bold bg-slate-50 text-slate-900 leading-tight">
+                  {t.id}<br />
+                  <span className="text-[9px] uppercase opacity-50 font-normal">{t.titolo}</span>
+                </td>
+                {t.livelli.map((l, j) => (
+                  <td key={j} className="p-4 border-l border-slate-100 leading-relaxed">{l}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 
-            const SectionHeader = ({ num, title }) => (
-                <div className="mb-6 shrink-0">
-                    <div className="flex items-center gap-2 mb-1">
-                        <div className="h-[2px] w-8 bg-blue-600"></div>
-                        <span className="text-[10px] font-bold text-blue-600 uppercase">Sezione {num}</span>
-                    </div>
-                    <h2 className="text-3xl font-black text-slate-900 uppercase leading-tight">{title}</h2>
+  const renderPage = () => {
+    switch(currentPage) {
+      case 0: return (
+        <div className="flex-1 flex flex-col justify-center items-center text-center relative overflow-hidden bg-slate-900 -m-8 md:-m-16 rounded-2xl md:rounded-[2rem] shadow-inner">
+          <div className="absolute inset-0 z-0">
+            <img src="copertina.jpg" alt="Copertina" className="w-full h-full object-cover opacity-40" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent"></div>
+          </div>
+          <div className="relative z-10 flex flex-col items-center p-8 mt-auto mb-10 w-full">
+            <span className="text-sm font-black text-orange-400 uppercase tracking-widest mb-4">Liceo Scientifico Volterra</span>
+            <h1 className="text-5xl md:text-7xl font-black text-white leading-none mb-6">
+              CURRICOLO DI<br />
+              <span className="text-blue-400">CITTADINANZA DIGITALE</span>
+            </h1>
+            <div className="w-32 h-2 bg-orange-500 rounded-full mb-8"></div>
+            <button onClick={nextPage} className="bg-orange-500 text-white px-12 py-5 rounded-3xl font-black uppercase tracking-widest shadow-xl hover:bg-orange-400 transition-all">
+              Consulta il Documento ✨
+            </button>
+          </div>
+        </div>
+      );
+      case 1: return (
+        <div className="h-full flex flex-col">
+          <SectionHeader num="0" title="Indice del Curricolo" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4 overflow-y-auto pr-2 custom-scrollbar">
+            {[
+              {t:"1. Premessa e Principio Unitario", p:2},
+              {t:"1.4-1.6 Metodologie e Strumenti", p:3},
+              {t:"2. Framework DigComp 3.0", p:4},
+              {t:"3. Dimensione Trasversale IA", p:5},
+              {t:"4. Struttura del Curricolo", p:6},
+              {t:"4.3 Mappatura - Comp 10", p:7},
+              {t:"4.3 Mappatura - Comp 11", p:8},
+              {t:"4.3 Mappatura - Comp 12", p:9},
+              {t:"4.4 Integrazione Discipline", p:10},
+              {t:"5. Progressione Verticale", p:11},
+              {t:"6. Rubrica Valutazione C10", p:12},
+              {t:"6. Rubrica Valutazione C11", p:13},
+              {t:"6. Rubrica Valutazione C12", p:14},
+              {t:"7. Scheda Operativa Docenti", p:15},
+              {t:"8. Valutazione e Monitoraggio", p:16},
+              {t:"Esportazione Ufficiale PTOF", p:17}
+            ].map((item, i) => (
+              <button key={i} onClick={() => goToPage(item.p)} className="text-left p-4 bg-white rounded-2xl border border-slate-100 hover:border-blue-500 hover:shadow-lg flex justify-between items-center group transition-all">
+                <span className="font-bold text-slate-700 text-[11px] group-hover:text-blue-600">{item.t}</span>
+                <ChevronRight size={14} className="text-slate-200 group-hover:text-blue-500" />
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+      case 2: return (
+        <div className="space-y-6 overflow-y-auto pr-2 custom-scrollbar">
+          <SectionHeader num="1" title="Premessa Metodologica" />
+          <div className="p-6 bg-blue-600 text-white rounded-3xl shadow-lg border-l-8 border-orange-500">
+            <h4 className="font-black text-orange-400 text-xs uppercase mb-2">Principio Unitario di Fondo</h4>
+            <p className="text-sm font-bold leading-relaxed mb-4">
+              Nel Liceo Scientifico la cittadinanza digitale si fonda sull’applicazione del metodo critico e scientifico all’ecosistema digitale, inteso come ambiente informativo, relazionale e socio-tecnico complesso.
+            </p>
+            <p className="text-xs opacity-90 italic">
+              Le tre competenze non sono compartimenti stagni, ma tre prospettive sullo stesso oggetto: la relazione tra conoscenza, tecnologia e responsabilità umana.
+            </p>
+          </div>
+          <div className="p-6 bg-white rounded-3xl shadow-sm border border-slate-100">
+            <h4 className="font-black text-blue-600 text-xs uppercase mb-3">1.1 Finalità del curricolo</h4>
+            <ul className="text-xs text-slate-700 space-y-2 list-disc pl-4 leading-relaxed">
+              <li>Promuovere lo sviluppo della cittadinanza digitale come competenza chiave europea.</li>
+              <li>Integrare competenze tecnologiche, pensiero critico e responsabilità etico-civile.</li>
+              <li>Sostenere l'uso consapevole, sicuro e creativo delle tecnologie nei contesti di studio e vita.</li>
+            </ul>
+          </div>
+        </div>
+      );
+      case 7: return (
+        <div className="space-y-6 overflow-y-auto pr-2 custom-scrollbar">
+          <SectionHeader num="4.3" title="Mappatura DigComp - C10" />
+          <div className="p-6 bg-white border-2 border-blue-500 rounded-3xl shadow-sm">
+            <h4 className="font-black text-blue-600 text-xs uppercase mb-2 flex items-center gap-2">
+              <BookOpen size={14} /> Nucleo Concettuale: Validazione Epistemologica
+            </h4>
+            <p className="text-[11px] text-slate-700 leading-relaxed">
+              <strong>Argomentazione Strategica:</strong> In un contesto di sovrabbondanza informativa e mediazione algoritmica, la competenza digitale coincide con la capacità di validare criticamente i dati. Per il Liceo Scientifico, questo rappresenta l’estensione del metodo scientifico all’ambiente digitale: distinguere tra dato grezzo, elaborazione algoritmica e conoscenza scientificamente fondata.
+            </p>
+          </div>
+          <div className="space-y-4">
+            <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100">
+              <h5 className="font-bold text-xs text-blue-900 mb-1">T.10.1 – Validazione epistemologica</h5>
+              <p className="text-xs text-slate-700">Ricercare, valutare e gestire dati applicando il metodo scientifico per riconoscere la disinformazione.</p>
+            </div>
+            <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100">
+              <h5 className="font-bold text-xs text-blue-900 mb-1">T.10.2 – Dati e modelli</h5>
+              <p className="text-xs text-slate-700">Analizzare e interpretare dati e modelli algoritmici, riconoscendone limiti e bias.</p>
+            </div>
+          </div>
+        </div>
+      );
+      case 8: return (
+        <div className="space-y-6 overflow-y-auto pr-2 custom-scrollbar">
+          <SectionHeader num="4.3" title="Mappatura DigComp - C11" />
+          <div className="p-6 bg-white border-2 border-orange-500 rounded-3xl shadow-sm">
+            <h4 className="font-black text-orange-600 text-xs uppercase mb-2 flex items-center gap-2">
+              <MessageSquare size={14} /> Nucleo Concettuale: Comunicazione Scientifica ed Etica
+            </h4>
+            <p className="text-[11px] text-slate-700 leading-relaxed">
+              <strong>Argomentazione Strategica:</strong> La comunicazione digitale è una competenza cognitiva complessa. Si fonda sulla capacità di selezionare registri adeguati, argomentare in modo logico-razionale e collaborare alla costruzione condivisa della conoscenza, contrastando polarizzazione e linguaggi d’odio.
+            </p>
+          </div>
+          <div className="space-y-4">
+            <div className="bg-orange-50 p-4 rounded-2xl border border-orange-100">
+              <h5 className="font-bold text-xs text-orange-900 mb-1">T.11.2 – Argomentazione razionale</h5>
+              <p className="text-xs text-slate-700">Partecipare al dibattito digitale costruendo argomentazioni razionali basate su dati verificabili.</p>
+            </div>
+          </div>
+        </div>
+      );
+      case 9: return (
+        <div className="space-y-6 overflow-y-auto pr-2 custom-scrollbar">
+          <SectionHeader num="4.3" title="Mappatura DigComp - C12" />
+          <div className="p-6 bg-white border-2 border-slate-800 rounded-3xl shadow-sm">
+            <h4 className="font-black text-slate-800 text-xs uppercase mb-2 flex items-center gap-2">
+              <ShieldCheck size={14} /> Nucleo Concettuale: Integrità e Sostenibilità Sistemica
+            </h4>
+            <p className="text-[11px] text-slate-700 leading-relaxed">
+              <strong>Argomentazione Strategica:</strong> Adotta una visione sistemica integrando dimensione tecnica, giuridica e psicologica. La gestione dell’identità non è solo protezione, ma comprensione dei meccanismi di profilazione, Big Data e tracciamento. La sicurezza è una competenza razionale fondata sulla conoscenza dei rischi.
+            </p>
+          </div>
+          <div className="space-y-4">
+            <div className="bg-slate-100 p-4 rounded-2xl border border-slate-200">
+              <h5 className="font-bold text-xs text-slate-900 mb-1">T.12.1 – Identità digitale e dati</h5>
+              <p className="text-xs text-slate-700">Gestire la propria identità e reputazione online comprendendo i principi del GDPR e della profilazione.</p>
+            </div>
+          </div>
+        </div>
+      );
+      case 15: return (
+        <div className="h-full flex flex-col bg-white rounded-[3rem] shadow-sm border border-slate-100 p-8 overflow-hidden">
+          <div className="shrink-0 flex justify-between items-center mb-6">
+            <SectionHeader num="7" title="Scheda Operativa Dipartimenti" />
+            <button onClick={() => window.print()} className="no-print bg-slate-900 text-white px-5 py-2 rounded-xl text-[10px] font-bold flex items-center gap-2 hover:bg-blue-600">
+              <Printer size={14} /> Stampa Scheda
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto pr-4 custom-scrollbar text-[10px] text-slate-700 space-y-4 pb-8">
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+              <h4 className="font-bold text-blue-600 mb-2 uppercase">🧩 Sezione 1 – Dati Generali</h4>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="border-b border-slate-300 pb-1">Dipartimento:</div>
+                <div className="border-b border-slate-300 pb-1">Disciplina:</div>
+                <div className="border-b border-slate-300 pb-1">Classe:</div>
+                <div className="border-b border-slate-300 pb-1">Periodo:</div>
+              </div>
+            </div>
+            <div className="bg-white p-4 rounded-2xl border border-slate-200">
+              <h4 className="font-bold text-blue-600 mb-2 uppercase">🎯 Sezione 2 – Riferimento al Curricolo</h4>
+              <div className="space-y-2">
+                <div className="flex items-center gap-4">
+                  <label><input type="checkbox" className="mr-1" /> Comp. 10</label>
+                  <label><input type="checkbox" className="mr-1" /> Comp. 11</label>
+                  <label><input type="checkbox" className="mr-1" /> Comp. 12</label>
                 </div>
-            );
+                <div className="border-b border-slate-300 pb-1">Traguardo specifico (es. 10.1):</div>
+              </div>
+            </div>
+            <div className="bg-white p-4 rounded-2xl border border-slate-200">
+              <h4 className="font-bold text-blue-600 mb-2 uppercase">🛠️ Sezione 3 – Attività Didattica</h4>
+              <div className="space-y-2">
+                <div className="border-b border-slate-300 pb-1">Titolo Attività:</div>
+                <div className="border-b border-slate-300 min-h-[40px]">Descrizione:</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+      case 17: return (
+        <div className="h-full flex flex-col justify-center items-center text-center p-8">
+          <div className="mb-8 p-4 bg-blue-50 text-blue-600 rounded-full"><FileText size={48} /></div>
+          <SectionHeader num="10" title="Esportazione PTOF" />
+          <p className="text-sm text-slate-500 max-w-md mb-8 italic">Documento completo di Proposta Unitaria e Rubriche Integrali pronto per l'allegato al PTOF.</p>
+          <button onClick={() => window.print()} className="px-10 py-4 bg-slate-900 text-white rounded-2xl font-black uppercase text-xs flex items-center gap-3 hover:bg-blue-600 shadow-xl">
+            Genera Documento Finale <Printer size={16} />
+          </button>
+        </div>
+      );
+      default: return (
+        <div className="p-10 flex flex-col gap-6 overflow-y-auto h-full">
+          <SectionHeader num={currentPage} title="Sezione in aggiornamento" />
+          <p className="text-slate-400 italic">Contenuto integrale in fase di rendering...</p>
+        </div>
+      );
+    }
+  };
 
-            const renderRubrica = (title, data) => (
-                <div className="flex-1 flex flex-col overflow-hidden">
-                    <h3 className="text-lg font-bold text-slate-700 mb-4 uppercase">{title}</h3>
-                    <div className="flex-1 overflow-auto rounded-3xl border border-slate-200 bg-white shadow-sm custom-scrollbar">
-                        <table className="w-full text-[11px] border-collapse">
-                            <thead className="sticky top-0 bg-slate-900 text-white">
-                                <tr>
-                                    <th className="p-4 text-left w-1/5">Traguardo</th>
-                                    <th className="p-4 border-l border-white/10 w-1/5">Iniziale</th>
-                                    <th className="p-4 border-l border-white/10 w-1/5">Base</th>
-                                    <th className="p-4 border-l border-white/10 w-1/5">Intermedio</th>
-                                    <th className="p-4 border-l border-white/10 w-1/5">Avanzato</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100 text-slate-600">
-                                {data.map((t, i) => (
-                                    <tr key={i} className="hover:bg-slate-50">
-                                        <td className="p-4 font-bold bg-slate-50 text-slate-900">
-                                            {t.id}<br></br>
-                                            <span className="text-[9px] uppercase opacity-50">{t.titolo}</span>
-                                        </td>
-                                        {t.livelli.map((l, j) => (
-                                            <td key={j} className="p-4 border-l border-slate-100 leading-relaxed">{l}</td>
-                                        ))}
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            );
+  return (
+    <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4 font-sans">
+      <div className="w-full max-w-6xl bg-white rounded-[3.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row h-[850px] border-8 border-white relative">
+        <div className="no-print hidden md:flex w-24 bg-slate-900 flex-col items-center py-12 justify-between shrink-0">
+          <Laptop size={28} className="text-white/20" />
+          <div className="flex flex-col gap-8 items-center">
+            <button className="text-white text-[10px] font-black uppercase tracking-[0.3em] rotate-[-90deg] whitespace-nowrap mb-12 opacity-60 hover:opacity-100" onClick={() => goToPage(1)}>Indice PTOF</button>
+            <div className="w-1 bg-white/10 h-40 rounded-full relative">
+              <div className="absolute top-0 left-0 w-full bg-orange-500 rounded-full transition-all duration-500" style={{height:`${((currentPage+1)/totalPages)*100}%`}}/>
+            </div>
+          </div>
+          <Zap size={28} className="text-orange-500 cursor-pointer" onClick={() => goToPage(15)} />
+        </div>
+        <div className="flex-1 flex flex-col bg-slate-50 overflow-hidden">
+          <div className="no-print h-1.5 bg-slate-200"><div className="h-full bg-blue-600 transition-all duration-500" style={{width:`${((currentPage+1)/totalPages)*100}%`}}/></div>
+          <div id="ebook-content-area" className="flex-1 overflow-y-auto p-8 md:p-16 flex flex-col">{renderPage()}</div>
+          <div className="no-print h-24 border-t border-slate-100 flex items-center justify-between px-12 bg-white shrink-0">
+            <button onClick={prevPage} disabled={currentPage===0} className="flex items-center gap-3 text-xs font-black uppercase text-slate-900 disabled:opacity-10"><ChevronLeft size={20} /> Indietro</button>
+            <div className="flex flex-col items-center"><span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Pagina</span><span className="text-sm font-black text-slate-900">{currentPage+1}/{totalPages}</span></div>
+            <button onClick={nextPage} disabled={currentPage===totalPages-1} className="flex items-center gap-3 text-xs font-black uppercase text-slate-900 disabled:opacity-10">Avanti <ChevronRight size={20} /></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
-            const renderPage = () => {
-                switch(currentPage) {
-                    case 0: return (
-                        <div className="flex-1 flex flex-col justify-center items-center text-center relative overflow-hidden bg-slate-900 -m-8 md:-m-16 rounded-2xl md:rounded-[2rem] shadow-inner">
-                            {/* Immagine di sfondo */}
-                            <div className="absolute inset-0 z-0">
-                                <img src="copertina.jpg" alt="Copertina Cittadinanza Digitale" className="w-full h-full object-cover opacity-40" />
-                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent"></div>
-                            </div>
-                            
-                            {/* Contenuto sovrapposto */}
-                            <div className="relative z-10 flex flex-col items-center p-8 mt-auto mb-10 w-full">
-                                <span className="text-sm font-black text-orange-400 uppercase tracking-widest mb-4 drop-shadow-md">Liceo Scientifico Volterra</span>
-                                <h1 className="text-5xl md:text-7xl font-black text-white leading-none mb-6 drop-shadow-xl">
-                                    CURRICOLO DI<br></br>
-                                    <span className="text-blue-400">CITTADINANZA DIGITALE</span>
-                                </h1>
-                                <div className="w-32 h-2 bg-orange-500 rounded-full mb-8 shadow-[0_0_15px_rgba(249,115,22,0.8)]"></div>
-                                <p className="text-slate-300 font-bold max-w-sm uppercase mb-10 tracking-widest text-xs">Documento Integrale per PTOF</p>
-                                <button onClick={nextPage} className="no-print bg-orange-500 text-white px-12 py-5 rounded-3xl font-black uppercase tracking-widest shadow-[0_0_20px_rgba(249,115,22,0.4)] hover:bg-orange-400 hover:scale-105 transition-all">
-                                    Consulta il Documento ✨
-                                </button>
-                            </div>
-                        </div>
-                    );
-                    case 1: return (
-                        <div className="h-full flex flex-col">
-                            <SectionHeader num="0" title="Indice del Curricolo" />
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4 overflow-y-auto pr-2 custom-scrollbar">
-                                {[
-                                    {t:"1. Premessa (1.1-1.3)", p:2},
-                                    {t:"1. Premessa (1.4-1.6)", p:3},
-                                    {t:"2. Framework DigComp 3.0", p:4},
-                                    {t:"3. Intelligenza Artificiale", p:5},
-                                    {t:"4. Struttura e Traguardi", p:6},
-                                    {t:"4.3 Mappatura - Comp 10", p:7},
-                                    {t:"4.3 Mappatura - Comp 11", p:8},
-                                    {t:"4.3 Mappatura - Comp 12", p:9},
-                                    {t:"4.4 Integrazione Discipline", p:10},
-                                    {t:"5. Progressione Verticale", p:11},
-                                    {t:"6. Rubrica Valutazione C10", p:12},
-                                    {t:"6. Rubrica Valutazione C11", p:13},
-                                    {t:"6. Rubrica Valutazione C12", p:14},
-                                    {t:"7. Scheda Operativa", p:15},
-                                    {t:"8. Valutazione e Monitoraggio", p:16},
-                                    {t:"Esportazione Ufficiale", p:17}
-                                ].map((item, i) => (
-                                    <button key={i} onClick={() => goToPage(item.p)} className="text-left p-4 bg-white rounded-2xl border border-slate-100 hover:border-blue-500 hover:shadow-lg flex justify-between items-center group transition-all">
-                                        <span className="font-bold text-slate-700 text-[11px] group-hover:text-blue-600">{item.t}</span>
-                                        <Icon name="chevron-right" size={14} className="text-slate-200 group-hover:text-blue-500" />
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    );
-                    case 2: return (
-                        <div className="space-y-6 overflow-y-auto pr-2 custom-scrollbar">
-                            <SectionHeader num="1" title="Premessa Metodologica" />
-                            <div className="p-6 bg-white rounded-3xl shadow-sm border border-slate-100">
-                                <h4 className="font-black text-blue-600 text-xs uppercase mb-4">1.1 Finalità del curricolo</h4>
-                                <ul className="text-xs text-slate-700 space-y-2 list-disc pl-4 leading-relaxed">
-                                    <li>Promuovere lo sviluppo della cittadinanza digitale come competenza chiave europea.</li>
-                                    <li>Integrare competenze tecnologiche, pensiero critico e responsabilità etico-civile.</li>
-                                    <li>Sostenere l'uso consapevole, sicuro e creativo delle tecnologie nei contesti di studio e vita.</li>
-                                </ul>
-                            </div>
-                            <div className="p-6 bg-white rounded-3xl shadow-sm border border-slate-100">
-                                <h4 className="font-black text-blue-600 text-xs uppercase mb-4">1.2 Principi pedagogici</h4>
-                                <ul className="text-xs text-slate-700 space-y-2 list-disc pl-4 leading-relaxed">
-                                    <li>Centralità del metodo scientifico (osservare, analizzare, verificare, argomentare).</li>
-                                    <li>Apprendimento attivo e situato (compiti autentici, problem solving, project work).</li>
-                                    <li>Interdisciplinarità e trasversalità alle discipline.</li>
-                                    <li>Inclusione e personalizzazione dei percorsi.</li>
-                                </ul>
-                            </div>
-                            <div className="p-6 bg-slate-900 text-white rounded-3xl shadow-sm border border-slate-100">
-                                <h4 className="font-black text-orange-500 text-xs uppercase mb-4">1.3 Struttura delle competenze</h4>
-                                <ul className="text-xs text-slate-300 space-y-2 list-disc pl-4 leading-relaxed">
-                                    <li>Riferimento alle Competenze 10, 11, 12 dell'Educazione Civica.</li>
-                                    <li>Declinazione in traguardi di uscita osservabili.</li>
-                                    <li>Articolazione in livelli di padronanza (Iniziale, Base, Intermedio, Avanzato).</li>
-                                </ul>
-                            </div>
-                        </div>
-                    );
-                    case 3: return (
-                        <div className="space-y-6 overflow-y-auto pr-2 custom-scrollbar">
-                            <SectionHeader num="1" title="Progressione e Metodi" />
-                            <div className="p-6 bg-white rounded-3xl border border-slate-100 shadow-sm">
-                                <h4 className="font-black text-blue-600 text-xs uppercase mb-4">1.4 Progressione didattica</h4>
-                                <ul className="text-xs text-slate-700 space-y-2 list-disc pl-4 leading-relaxed">
-                                    <li>Biennio: alfabetizzazione guidata e sviluppo della consapevolezza.</li>
-                                    <li>Triennio: autonomia, valutazione critica e responsabilità.</li>
-                                    <li>Progressione coerente con i livelli DigComp (Basic → Intermediate → Advanced).</li>
-                                </ul>
-                            </div>
-                            <div className="p-6 bg-white rounded-3xl border border-slate-100 shadow-sm">
-                                <h4 className="font-black text-blue-600 text-xs uppercase mb-4">1.5 Metodologie didattiche</h4>
-                                <ul className="text-xs text-slate-700 space-y-2 list-disc pl-4 leading-relaxed">
-                                    <li>Compiti autentici e situazioni-problema.</li>
-                                    <li>Didattica laboratoriale e digitale.</li>
-                                    <li>Cooperative learning e peer education.</li>
-                                    <li>Uso consapevole di strumenti digitali e ambienti collaborativi.</li>
-                                </ul>
-                            </div>
-                            <div className="p-6 bg-orange-50 rounded-3xl border border-orange-100 shadow-sm">
-                                <h4 className="font-black text-orange-600 text-xs uppercase mb-4">1.6 Strumenti e ambienti</h4>
-                                <ul className="text-xs text-slate-700 space-y-2 list-disc pl-4 leading-relaxed">
-                                    <li>Piattaforme di apprendimento digitale (LMS, cloud collaborativi).</li>
-                                    <li>Strumenti per la ricerca e l'analisi dei dati.</li>
-                                    <li>Applicazioni per la creazione di contenuti multimediali.</li>
-                                    <li>Banche dati e motori di ricerca.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    );
-                    case 4: return (
-                        <div className="h-full flex flex-col">
-                            <SectionHeader num="2" title="Framework DigComp 3.0" />
-                            <div className="p-8 bg-blue-600 text-white rounded-[3rem] shadow-xl mb-6">
-                                <p className="text-sm leading-relaxed mb-4">Il curricolo fa riferimento alle cinque aree di competenza del framework DigComp 3.0. L'aggiornamento alla versione 3.0 integra le dimensioni relative all'Intelligenza Artificiale, alla disinformazione, al benessere e alla sostenibilità ambientale.</p>
-                            </div>
-                            <div className="grid grid-cols-1 gap-2 overflow-y-auto pr-2 custom-scrollbar">
-                                {[
-                                    { t: "1) Alfabetizzazione su informazioni e dati", i: "search" }, 
-                                    { t: "2) Comunicazione e collaborazione", i: "message-square" }, 
-                                    { t: "3) Creazione di contenuti digitali", i: "pen-tool" }, 
-                                    { t: "4) Sicurezza, benessere e sostenibilità", i: "shield-check" }, 
-                                    { t: "5) Risoluzione di problemi", i: "wrench" }
-                                ].map((area, i) => (
-                                    <div key={i} className="p-4 bg-white rounded-2xl border border-slate-100 flex items-center gap-4">
-                                        <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center font-black text-blue-600">
-                                            <Icon name={area.i} size={18} />
-                                        </div>
-                                        <span className="text-xs font-bold text-slate-700">{area.t}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    );
-                    case 5: return (
-                        <div className="h-full flex flex-col">
-                            <SectionHeader num="3" title="Dimensione IA" />
-                            <div className="p-8 bg-white border border-slate-100 rounded-[3rem] space-y-6 shadow-sm">
-                                <h4 className="font-black text-orange-500 text-sm uppercase">3. Dimensione trasversale dell'Intelligenza Artificiale</h4>
-                                <p className="text-sm font-bold text-slate-900 border-l-4 border-orange-500 pl-4 leading-relaxed">
-                                    L'Intelligenza Artificiale è considerata una competenza trasversale. Gli studenti sono guidati a:
-                                </p>
-                                <div className="space-y-4 mt-6">
-                                    <div className="flex gap-4 items-center">
-                                        <div className="p-3 bg-slate-100 text-blue-600 rounded-xl"><Icon name="cpu" /></div>
-                                        <p className="text-xs text-slate-700"><strong>Comprendere</strong> il funzionamento di base dei sistemi algoritmici e generativi.</p>
-                                    </div>
-                                    <div className="flex gap-4 items-center">
-                                        <div className="p-3 bg-slate-100 text-blue-600 rounded-xl"><Icon name="eye-off" /></div>
-                                        <p className="text-xs text-slate-700"><strong>Riconoscere</strong> limiti, allucinazioni e bias dei contenuti prodotti da IA.</p>
-                                    </div>
-                                    <div className="flex gap-4 items-center">
-                                        <div className="p-3 bg-slate-100 text-blue-600 rounded-xl"><Icon name="pen-tool" /></div>
-                                        <p className="text-xs text-slate-700"><strong>Utilizzare</strong> strumenti di IA in modo trasparente (dichiarando l'uso del prompt).</p>
-                                    </div>
-                                    <div className="flex gap-4 items-center">
-                                        <div className="p-3 bg-slate-100 text-blue-600 rounded-xl"><Icon name="user-check" /></div>
-                                        <p className="text-xs text-slate-700"><strong>Distinguere</strong> tra contenuti umani e generati, esercitando supervisione (Human-in-the-loop).</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    );
-                    case 6: return (
-                        <div className="space-y-6 overflow-y-auto pr-2 custom-scrollbar">
-                            <SectionHeader num="4.1-4.2" title="Struttura e Traguardi" />
-                            <div className="p-6 bg-white border border-slate-100 shadow-sm rounded-3xl">
-                                <h4 className="font-black text-blue-600 text-xs uppercase mb-4">4.1 Competenze di Educazione Civica (10-11-12)</h4>
-                                <p className="text-xs text-slate-700 leading-relaxed mb-4">
-                                    Il curricolo si struttura attorno alle tre competenze digitali previste dalle Linee Guida per l'insegnamento dell'Educazione Civica:
-                                </p>
-                                <ul className="text-xs text-slate-700 space-y-2 list-disc pl-4 leading-relaxed">
-                                    <li><strong>Competenza 10:</strong> Accesso critico e responsabile alle informazioni.</li>
-                                    <li><strong>Competenza 11:</strong> Comunicazione e cooperazione digitale.</li>
-                                    <li><strong>Competenza 12:</strong> Identità digitale, sicurezza e benessere.</li>
-                                </ul>
-                            </div>
-                            <div className="p-6 bg-white border border-slate-100 shadow-sm rounded-3xl">
-                                <h4 className="font-black text-orange-600 text-xs uppercase mb-4">4.2 Traguardi di uscita</h4>
-                                <p className="text-xs text-slate-700 leading-relaxed">
-                                    Ogni competenza è stata declinata in <strong>traguardi di uscita specifici e misurabili</strong>, che descrivono ciò che lo studente deve saper fare al termine del percorso. Questi traguardi sono stati successivamente mappati sulle 21 competenze specifiche del framework DigComp 3.0 per garantire l'allineamento europeo.
-                                </p>
-                            </div>
-                        </div>
-                    );
-                    case 7: return (
-                        <div className="space-y-6 overflow-y-auto pr-2 custom-scrollbar">
-                            <SectionHeader num="4.3" title="Mappatura DigComp - C10" />
-                            <div className="p-6 bg-blue-50 border-l-4 border-blue-600 rounded-r-3xl shadow-sm">
-                                <h4 className="font-black text-blue-800 text-sm uppercase mb-4">🔷 COMPETENZA 10 – Accesso critico e responsabile alle informazioni</h4>
-                                
-                                <div className="space-y-4">
-                                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-blue-100">
-                                        <h5 className="font-bold text-xs text-slate-900 mb-2">T.10.1 – Validazione epistemologica</h5>
-                                        <p className="text-[11px] text-slate-600 italic mb-2">Area 1 – Alfabetizzazione su Informazioni e Dati (1.1, 1.2)</p>
-                                        <p className="text-xs text-slate-700 leading-relaxed">Ricercare, valutare e gestire dati, informazioni e contenuti digitali, applicando il metodo scientifico per distinguere fatti da opinioni e riconoscere la disinformazione.</p>
-                                    </div>
-                                    
-                                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-blue-100">
-                                        <h5 className="font-bold text-xs text-slate-900 mb-2">T.10.2 – Dati e modelli</h5>
-                                        <p className="text-[11px] text-slate-600 italic mb-2">Area 1 (1.3) / Area 5 (5.1, 5.2)</p>
-                                        <p className="text-xs text-slate-700 leading-relaxed">Analizzare e interpretare dati e modelli algoritmici, riconoscendone limiti, distorsioni (bias) e impatto nei processi decisionali.</p>
-                                    </div>
-
-                                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-blue-100">
-                                        <h5 className="font-bold text-xs text-slate-900 mb-2">T.10.3 – Produzione responsabile</h5>
-                                        <p className="text-[11px] text-slate-600 italic mb-2">Area 3 – Creazione di Contenuti Digitali (3.1, 3.2, 3.3)</p>
-                                        <p className="text-xs text-slate-700 leading-relaxed">Creare e rielaborare contenuti digitali nel rispetto del copyright, dell'etica e dichiarando in modo trasparente l'eventuale uso di Intelligenza Artificiale.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    );
-                    case 8: return (
-                        <div className="space-y-6 overflow-y-auto pr-2 custom-scrollbar">
-                            <SectionHeader num="4.3" title="Mappatura DigComp - C11" />
-                            <div className="p-6 bg-orange-50 border-l-4 border-orange-500 rounded-r-3xl shadow-sm">
-                                <h4 className="font-black text-orange-800 text-sm uppercase mb-4">🔷 COMPETENZA 11 – Comunicazione e cooperazione digitale</h4>
-                                
-                                <div className="space-y-4">
-                                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-orange-100">
-                                        <h5 className="font-bold text-xs text-slate-900 mb-2">T.11.1 – Adeguatezza comunicativa</h5>
-                                        <p className="text-[11px] text-slate-600 italic mb-2">Area 2 – Comunicazione e Collaborazione (2.1, 2.2, 2.5)</p>
-                                        <p className="text-xs text-slate-700 leading-relaxed">Interagire e condividere informazioni attraverso le tecnologie digitali adattando linguaggi e registri ai diversi contesti e nel rispetto della netiquette.</p>
-                                    </div>
-                                    
-                                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-orange-100">
-                                        <h5 className="font-bold text-xs text-slate-900 mb-2">T.11.2 – Argomentazione razionale</h5>
-                                        <p className="text-[11px] text-slate-600 italic mb-2">Area 2 – Comunicazione e Collaborazione (2.3, 2.4)</p>
-                                        <p className="text-xs text-slate-700 leading-relaxed">Partecipare al dibattito pubblico digitale costruendo argomentazioni razionali basate su dati verificabili e contrastando logiche di polarizzazione.</p>
-                                    </div>
-
-                                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-orange-100">
-                                        <h5 className="font-bold text-xs text-slate-900 mb-2">T.11.3 – Collaborazione digitale</h5>
-                                        <p className="text-[11px] text-slate-600 italic mb-2">Area 2 (2.4) / Area 3 (3.1)</p>
-                                        <p className="text-xs text-slate-700 leading-relaxed">Collaborare attraverso le tecnologie digitali per la costruzione condivisa della conoscenza e l'utilizzo di ambienti cloud.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    );
-                    case 9: return (
-                        <div className="space-y-6 overflow-y-auto pr-2 custom-scrollbar">
-                            <SectionHeader num="4.3" title="Mappatura DigComp - C12" />
-                            <div className="p-6 bg-slate-800 border-l-4 border-slate-400 rounded-r-3xl shadow-sm">
-                                <h4 className="font-black text-white text-sm uppercase mb-4">🔷 COMPETENZA 12 – Identità digitale, sicurezza e benessere</h4>
-                                
-                                <div className="space-y-4">
-                                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-                                        <h5 className="font-bold text-xs text-slate-900 mb-2">T.12.1 – Identità digitale e dati</h5>
-                                        <p className="text-[11px] text-slate-600 italic mb-2">Area 2 (2.6) / Area 4 (4.2)</p>
-                                        <p className="text-xs text-slate-700 leading-relaxed">Gestire la propria identità digitale, la web reputation e i dati personali, comprendendo i principi del GDPR e i meccanismi di profilazione.</p>
-                                    </div>
-                                    
-                                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-                                        <h5 className="font-bold text-xs text-slate-900 mb-2">T.12.2 – Sicurezza digitale</h5>
-                                        <p className="text-[11px] text-slate-600 italic mb-2">Area 4 – Sicurezza (4.1, 4.2)</p>
-                                        <p className="text-xs text-slate-700 leading-relaxed">Proteggere i dispositivi e gli ambienti digitali valutando criticamente i rischi (cybersecurity) e applicando strategie di difesa.</p>
-                                    </div>
-
-                                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-                                        <h5 className="font-bold text-xs text-slate-900 mb-2">T.12.3 – Benessere e sostenibilità</h5>
-                                        <p className="text-[11px] text-slate-600 italic mb-2">Area 4 – Sicurezza (4.3, 4.4)</p>
-                                        <p className="text-xs text-slate-700 leading-relaxed">Tutelare il proprio benessere psicofisico prevenendo rischi per la salute e adottare comportamenti che limitino l'impatto ambientale delle tecnologie.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    );
-                    case 10: return (
-                        <div className="space-y-6 overflow-y-auto pr-2 custom-scrollbar">
-                            <SectionHeader num="4.4" title="Integrazione nelle discipline" />
-                            <div className="p-6 bg-white rounded-3xl shadow-sm border border-slate-100">
-                                <h4 className="font-black text-blue-600 text-xs uppercase mb-3">Ruolo dei Dipartimenti</h4>
-                                <p className="text-xs text-slate-700 mb-6 leading-relaxed">
-                                    L'insegnamento della cittadinanza digitale non è demandato a una singola materia, ma è trasversale. Ogni dipartimento disciplinare concorre declinando i traguardi nel proprio ambito epistemologico.
-                                </p>
-                                
-                                <h4 className="font-black text-orange-600 text-xs uppercase mb-3">Nuclei concettuali (esempi)</h4>
-                                <div className="space-y-3 mb-6">
-                                    <div className="p-3 bg-slate-50 rounded-xl text-xs leading-relaxed border border-slate-100">
-                                        <strong className="text-slate-900 block mb-1">Area Umanistica:</strong> 
-                                        Analisi del linguaggio, argomentazione, etica, diritto e storia delle tecnologie.
-                                    </div>
-                                    <div className="p-3 bg-slate-50 rounded-xl text-xs leading-relaxed border border-slate-100">
-                                        <strong className="text-slate-900 block mb-1">Area Scientifica:</strong> 
-                                        Analisi dati (data literacy), comprensione modelli matematici, validazione fonti empiriche, impatto ambientale.
-                                    </div>
-                                    <div className="p-3 bg-slate-50 rounded-xl text-xs leading-relaxed border border-slate-100">
-                                        <strong className="text-slate-900 block mb-1">Lingue straniere:</strong> 
-                                        Comunicazione interculturale digitale, uso critico traduttori IA.
-                                    </div>
-                                </div>
-
-                                <h4 className="font-black text-blue-600 text-xs uppercase mb-3">Finalità dell'integrazione</h4>
-                                <p className="text-xs text-slate-700 leading-relaxed">
-                                    Garantire un approccio olistico in cui gli strumenti digitali non siano visti solo come fini, ma come mezzi applicati a compiti autentici all'interno dei saperi disciplinari.
-                                </p>
-                            </div>
-                        </div>
-                    );
-                    case 11: return (
-                        <div className="h-full flex flex-col">
-                            <SectionHeader num="5" title="Progressione Verticale" />
-                            <div className="grid grid-cols-1 gap-4 mb-6 overflow-y-auto pr-2 custom-scrollbar">
-                                <div className="p-6 bg-white rounded-3xl border border-slate-100 shadow-sm">
-                                    <h4 className="font-black text-blue-600 text-xs uppercase mb-2">5.1 Biennio</h4>
-                                    <p className="text-[11px] text-slate-600 mb-2"><strong>Livelli:</strong> Iniziale → Base → Intermedio</p>
-                                    <p className="text-[11px] text-slate-600 leading-relaxed"><strong>Fase di:</strong> Applicazione guidata, riconoscimento, consapevolezza iniziale.</p>
-                                    <p className="text-[11px] text-slate-600 leading-relaxed"><strong>Focus:</strong> Riconoscere fonti affidabili, utilizzare strumenti digitali di base in modo guidato, comprendere i rischi primari della rete e le regole della netiquette.</p>
-                                </div>
-                                <div className="p-6 bg-white rounded-3xl border border-slate-100 shadow-sm">
-                                    <h4 className="font-black text-blue-600 text-xs uppercase mb-2">5.2 Triennio</h4>
-                                    <p className="text-[11px] text-slate-600 mb-2"><strong>Livelli:</strong> Base → Intermedio → Avanzato</p>
-                                    <p className="text-[11px] text-slate-600 leading-relaxed"><strong>Fase di:</strong> Autonomia, valutazione critica, responsabilità etica.</p>
-                                    <p className="text-[11px] text-slate-600 leading-relaxed"><strong>Focus:</strong> Utilizzo autonomo di strumenti complessi, valutazione dell'attendibilità in contesti ambigui, consapevolezza dei bias dell'IA, gestione proattiva dell'identità digitale e della web reputation.</p>
-                                </div>
-                                <div className="p-6 bg-slate-900 text-white rounded-3xl shadow-xl">
-                                    <h4 className="font-black text-white text-xs uppercase mb-3">5.3 Livello Atteso in Uscita (V Anno)</h4>
-                                    <p className="text-[11px] text-slate-300 mb-3">Al termine del percorso liceale, lo studente è atteso:</p>
-                                    <ul className="text-[11px] space-y-2 opacity-90 list-disc pl-4">
-                                        <li>Al livello <strong className="text-orange-400">Advanced</strong> per i traguardi fondamentali delle Competenze 10 e 11.</li>
-                                        <li>Al livello <strong className="text-orange-400">Intermediate–Advanced</strong> per la Competenza 12, con particolare attenzione a sicurezza, benessere e sostenibilità.</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    );
-                    case 12: return renderRubrica("Area 1 - Informazioni e Dati (C10)", rubricheData.C10);
-                    case 13: return renderRubrica("Area 2 - Comunicazione (C11)", rubricheData.C11);
-                    case 14: return renderRubrica("Area 4 - Sicurezza (C12)", rubricheData.C12);
-                    
-                    // NEW PAGE 15: Scheda Operativa (Sostituisce il Lab IA)
-                    case 15: return (
-                        <div className="h-full flex flex-col bg-white rounded-[3rem] shadow-sm border border-slate-100 p-8 overflow-hidden">
-                            <div className="shrink-0 flex justify-between items-center mb-6">
-                                <SectionHeader num="7" title="Scheda Operativa Dipartimenti" />
-                                <button onClick={() => window.print()} className="no-print bg-slate-900 text-white px-5 py-3 rounded-xl text-xs font-bold flex items-center gap-2 hover:bg-blue-600 transition-colors">
-                                    <Icon name="printer" size={16}/> Stampa Scheda
-                                </button>
-                            </div>
-                            <div className="flex-1 overflow-y-auto pr-4 custom-scrollbar text-sm text-slate-700 space-y-6 pb-8">
-                                <div className="text-center mb-6 border-b border-slate-200 pb-4">
-                                    <h3 className="font-black text-lg">SCHEDA OPERATIVA DIPARTIMENTI</h3>
-                                    <p className="text-xs text-slate-500 uppercase">Curricolo di Cittadinanza Digitale - Liceo Volterra</p>
-                                </div>
-
-                                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                                    <h4 className="font-bold text-blue-600 mb-3 text-xs uppercase">🧩 Sezione 1 – Dati Generali</h4>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                                        <div><span className="font-semibold">Dipartimento:</span> <span className="form-line"></span></div>
-                                        <div><span className="font-semibold">Disciplina:</span> <span className="form-line"></span></div>
-                                        <div><span className="font-semibold">Classe/i:</span> <span className="form-line"></span></div>
-                                        <div className="flex items-center gap-4">
-                                            <span className="font-semibold">Periodo:</span> 
-                                            <label><input type="checkbox" className="form-checkbox"/> Trimestre</label>
-                                            <label><input type="checkbox" className="form-checkbox"/> Pentamestre</label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="bg-white p-4 rounded-2xl border border-slate-200">
-                                    <h4 className="font-bold text-blue-600 mb-3 text-xs uppercase">🎯 Sezione 2 – Riferimento al Curricolo</h4>
-                                    <div className="mb-4 text-xs space-y-2">
-                                        <span className="font-semibold block">Competenza (10–11–12):</span>
-                                        <label className="block"><input type="checkbox" className="form-checkbox"/> 10 – Informazione</label>
-                                        <label className="block"><input type="checkbox" className="form-checkbox"/> 11 – Comunicazione</label>
-                                        <label className="block"><input type="checkbox" className="form-checkbox"/> 12 – Identità / sicurezza / benessere</label>
-                                    </div>
-                                    <div className="mb-4 text-xs">
-                                        <span className="font-semibold block mb-1">Traguardo di competenza (es. 10.1 / 11.2):</span>
-                                        <span className="form-line mt-2"></span>
-                                    </div>
-                                    <div className="text-xs space-y-2">
-                                        <span className="font-semibold block mb-2">🔗 Mappatura DigComp 3.0:</span>
-                                        <div className="flex gap-4 flex-wrap">
-                                            <span><input type="checkbox" className="form-checkbox"/> 1.1</span>
-                                            <span><input type="checkbox" className="form-checkbox"/> 1.2</span>
-                                            <span><input type="checkbox" className="form-checkbox"/> 1.3</span>
-                                            <span className="mx-2 text-slate-300">|</span>
-                                            <span><input type="checkbox" className="form-checkbox"/> 2.1</span>
-                                            <span><input type="checkbox" className="form-checkbox"/> 2.2</span>
-                                            <span><input type="checkbox" className="form-checkbox"/> 2.4</span>
-                                            <span className="mx-2 text-slate-300">|</span>
-                                            <span><input type="checkbox" className="form-checkbox"/> 3.1</span>
-                                            <span><input type="checkbox" className="form-checkbox"/> 3.2</span>
-                                            <span className="mx-2 text-slate-300">|</span>
-                                            <span><input type="checkbox" className="form-checkbox"/> 4.1</span>
-                                            <span><input type="checkbox" className="form-checkbox"/> 4.2</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="bg-white p-4 rounded-2xl border border-slate-200">
-                                    <h4 className="font-bold text-blue-600 mb-3 text-xs uppercase">🧠 Sezione 3 – Declinazione Disciplinare</h4>
-                                    <div className="text-xs space-y-4">
-                                        <div><span className="font-semibold block mb-1">Nucleo concettuale disciplinare:</span><span className="form-line"></span></div>
-                                        <div><span className="font-semibold block mb-1">Contenuti disciplinari coinvolti:</span><span className="form-line"></span></div>
-                                    </div>
-                                </div>
-
-                                <div className="bg-white p-4 rounded-2xl border border-slate-200">
-                                    <h4 className="font-bold text-blue-600 mb-3 text-xs uppercase">🛠️ Sezione 4 – Attività Didattica</h4>
-                                    <div className="text-xs space-y-4">
-                                        <div><span className="font-semibold block mb-1">Titolo attività:</span><span className="form-line"></span></div>
-                                        <div><span className="font-semibold block mb-1">Descrizione (cosa fanno gli studenti):</span><span className="form-line"></span><span className="form-line mt-2"></span></div>
-                                        <div className="flex items-center gap-4 mt-2">
-                                            <span className="font-semibold">Tipo di lavoro:</span> 
-                                            <label><input type="checkbox" className="form-checkbox"/> Individuale</label>
-                                            <label><input type="checkbox" className="form-checkbox"/> Gruppo</label>
-                                        </div>
-                                        <div><span className="font-semibold block mb-1">Strumenti utilizzati:</span><span className="form-line"></span></div>
-                                        <div><span className="font-semibold block mb-1">Prodotto finale:</span><span className="form-line"></span></div>
-                                    </div>
-                                </div>
-
-                                <div className="bg-orange-50 p-4 rounded-2xl border border-orange-100">
-                                    <h4 className="font-bold text-orange-600 mb-3 text-xs uppercase">🤖 Sezione 5 – Intelligenza Artificiale</h4>
-                                    <div className="text-xs space-y-3">
-                                        <div className="flex items-center gap-4">
-                                            <span className="font-semibold">L'attività prevede l'uso di IA?</span> 
-                                            <label><input type="checkbox" className="form-checkbox"/> NO</label>
-                                            <label><input type="checkbox" className="form-checkbox"/> SÌ</label>
-                                        </div>
-                                        <div className="space-y-1 pl-4 border-l-2 border-orange-200">
-                                            <label className="block"><input type="checkbox" className="form-checkbox"/> analisi di output IA</label>
-                                            <label className="block"><input type="checkbox" className="form-checkbox"/> produzione con IA</label>
-                                            <label className="block"><input type="checkbox" className="form-checkbox"/> confronto umano / IA</label>
-                                            <div className="flex items-center gap-2"><input type="checkbox" className="form-checkbox"/> altro: <span className="form-line w-1/2"></span></div>
-                                        </div>
-                                        <div className="mt-2"><span className="font-semibold block mb-1">Come viene gestita la trasparenza?</span><span className="form-line"></span></div>
-                                    </div>
-                                </div>
-
-                                <div className="bg-white p-4 rounded-2xl border border-slate-200">
-                                    <h4 className="font-bold text-blue-600 mb-3 text-xs uppercase">📊 Sezione 6 – Evidenze Osservabili</h4>
-                                    <div className="text-xs space-y-2">
-                                        <span className="font-semibold block mb-1">Cosa osservo per dire che la competenza è acquisita? (collegare ai descrittori)</span>
-                                        <span className="form-line"></span><span className="form-line mt-2"></span>
-                                    </div>
-                                </div>
-
-                                <div className="bg-white p-4 rounded-2xl border border-slate-200">
-                                    <h4 className="font-bold text-blue-600 mb-3 text-xs uppercase">📏 Sezione 7 – Valutazione</h4>
-                                    <div className="text-xs space-y-4">
-                                        <div><span className="font-semibold block mb-1">Traguardo valutato:</span><span className="form-line"></span></div>
-                                        <div className="flex items-center gap-4">
-                                            <span className="font-semibold">Livello atteso:</span> 
-                                            <label><input type="checkbox" className="form-checkbox"/> Base</label>
-                                            <label><input type="checkbox" className="form-checkbox"/> Intermedio</label>
-                                            <label><input type="checkbox" className="form-checkbox"/> Avanzato</label>
-                                        </div>
-                                        <div><span className="font-semibold block mb-1">Indicatori utilizzati (dalla rubrica):</span><span className="form-line"></span></div>
-                                    </div>
-                                </div>
-
-                                <div className="bg-white p-4 rounded-2xl border border-slate-200">
-                                    <h4 className="font-bold text-blue-600 mb-3 text-xs uppercase">🔄 Sezione 8 – Interdisciplinarità</h4>
-                                    <div className="text-xs">
-                                        <span className="font-semibold block mb-1">Collegamenti con altre discipline:</span>
-                                        <span className="form-line"></span>
-                                    </div>
-                                </div>
-
-                                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                                    <h4 className="font-bold text-blue-600 mb-3 text-xs uppercase">🌱 Sezione 9 – Riflessione Didattica</h4>
-                                    <div className="text-xs space-y-4">
-                                        <div><span className="font-semibold block mb-1">Cosa ha funzionato?</span><span className="form-line"></span></div>
-                                        <div><span className="font-semibold block mb-1">Cosa migliorare?</span><span className="form-line"></span></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    );
-
-                    case 16: return (
-                        <div className="h-full flex flex-col justify-start items-center text-left p-2 overflow-y-auto custom-scrollbar">
-                            <SectionHeader num="8-9" title="Valutazione e Monitoraggio" />
-                            <div className="grid grid-cols-1 gap-4 mt-2 w-full">
-                                <div className="p-6 bg-white rounded-3xl border border-slate-100 shadow-sm">
-                                    <h4 className="font-bold text-sm mb-4 text-blue-600 uppercase">8. Modalità di valutazione</h4>
-                                    <p className="text-xs text-slate-700 mb-2">La valutazione delle competenze digitali è integrata nella valutazione dell'Educazione Civica e si basa su:</p>
-                                    <ul className="text-xs text-slate-600 list-disc pl-5 mb-4 space-y-1">
-                                        <li>osservazione sistematica delle prestazioni;</li>
-                                        <li>utilizzo della rubrica di valutazione condivisa;</li>
-                                        <li>analisi dei prodotti digitali realizzati dagli studenti;</li>
-                                        <li>partecipazione a attività collaborative;</li>
-                                        <li>capacità di riflessione critica sui processi.</li>
-                                    </ul>
-                                    <p className="text-xs text-slate-700 mb-2"><strong>Strumenti di valutazione:</strong> rubriche per competenze, compiti autentici, portfolio digitale, autovalutazione e peer assessment.</p>
-                                    <p className="text-xs text-slate-700"><strong>La valutazione è:</strong> formativa (in itinere), sommativa (a conclusione dei percorsi), orientata allo sviluppo delle competenze.</p>
-                                </div>
-                                <div className="p-6 bg-white rounded-3xl border border-slate-100 shadow-sm">
-                                    <h4 className="font-bold text-sm mb-4 text-orange-600 uppercase">9. Monitoraggio e aggiornamento</h4>
-                                    <p className="text-xs text-slate-700 mb-2">Il curricolo digitale è oggetto di monitoraggio continuo e aggiornamento periodico.</p>
-                                    <p className="text-xs text-slate-700 mb-2"><strong>Azioni di monitoraggio:</strong> analisi degli esiti di apprendimento, confronto nei Consigli di classe, raccolta di evidenze didattiche, feedback degli studenti.</p>
-                                    <p className="text-xs text-slate-700 mb-2"><strong>Aggiornamento del curricolo.</strong> Il curricolo viene aggiornato:</p>
-                                    <ul className="text-xs text-slate-600 list-disc pl-5 mb-4 space-y-1">
-                                        <li>in base all'evoluzione delle tecnologie digitali;</li>
-                                        <li>in relazione agli aggiornamenti del framework DigComp;</li>
-                                        <li>in coerenza con le indicazioni ministeriali e le priorità educative;</li>
-                                        <li>sulla base delle evidenze emerse dalla pratica didattica.</li>
-                                    </ul>
-                                    <p className="text-xs text-slate-700 font-bold">L'obiettivo è garantire un curricolo dinamico, coerente e aggiornato, capace di rispondere alle trasformazioni della società digitale.</p>
-                                </div>
-                            </div>
-                        </div>
-                    );
-                    case 17: return (
-                        <div className="h-full flex flex-col justify-center items-center text-center p-8">
-                            <div className="mb-8 p-4 bg-blue-50 text-blue-600 rounded-full">
-                                <Icon name="download-cloud" size={48} />
-                            </div>
-                            <SectionHeader num="10" title="Esportazione PTOF" />
-                            <p className="text-sm text-slate-500 max-w-md mb-8">Scarica la versione ufficiale del Curricolo di Cittadinanza Digitale del Liceo Volterra per allegarla al documento PTOF.</p>
-                            <div className="flex gap-4">
-                                <button onClick={() => window.print()} className="px-8 py-4 bg-slate-900 text-white rounded-2xl font-black uppercase text-xs flex items-center gap-2 hover:bg-blue-600 transition-colors">
-                                    Stampa PDF <Icon name="printer" />
-                                </button>
-                            </div>
-                        </div>
-                    );
-                    default: return (
-                        <div className="flex-1 flex flex-col justify-center items-center text-slate-300">
-                            <Icon name="loader-2" className="animate-spin mb-4" size={48} />
-                            <p className="font-black uppercase text-[10px]">Caricamento in corso...</p>
-                        </div>
-                    );
-                }
-            };
-
-            return (
-                <div className="min-h-screen flex items-center justify-center p-4">
-                    <div className="w-full max-w-6xl bg-white rounded-[4rem] shadow-2xl overflow-hidden flex flex-col md:flex-row h-[850px] border-8 border-white relative shadow-slate-200">
-                        {/* Sidebar */}
-                        <div className="no-print hidden md:flex w-24 bg-slate-900 flex-col items-center py-12 justify-between shrink-0">
-                            <Icon name="laptop" size={32} className="text-white/20" />
-                            <div className="flex flex-col gap-8 items-center">
-                                <button className="text-white text-[10px] font-black uppercase tracking-[0.3em] rotate-[-90deg] whitespace-nowrap mb-12 opacity-60 hover:opacity-100 transition-all" onClick={() => goToPage(1)}>
-                                    Indice PTOF
-                                </button>
-                                <div className="w-1 bg-white/10 h-40 rounded-full relative">
-                                    <div className="absolute top-0 left-0 w-full bg-orange-500 rounded-full transition-all duration-500 shadow-[0_0_15px_rgba(249,115,22,0.5)]" style={{ height: `${((currentPage+1)/totalPages)*100}%` }}></div>
-                                </div>
-                            </div>
-                            <div className="flex flex-col gap-4">
-                                <button onClick={() => goToPage(15)} className="text-orange-500 hover:scale-125 transition-all" title="Scheda Operativa">
-                                    <Icon name="file-text" size={28} />
-                                </button>
-                                <button onClick={() => window.print()} className="text-blue-400 hover:scale-125 transition-all" title="Stampa">
-                                    <Icon name="printer" size={24} />
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Main Content */}
-                        <div className="flex-1 flex flex-col bg-slate-50 overflow-hidden">
-                            <div className="no-print h-1.5 bg-slate-200 w-full shrink-0">
-                                <div className="h-full bg-blue-600 transition-all duration-500" style={{ width: `${((currentPage+1)/totalPages)*100}%` }}></div>
-                            </div>
-                            
-                            <div id="ebook-content-area" className="flex-1 overflow-y-auto p-8 md:p-16 custom-scrollbar flex flex-col">
-                                {renderPage()}
-                            </div>
-                            
-                            {/* Navigation Footer */}
-                            <div className="no-print h-24 border-t border-slate-100 flex items-center justify-between px-12 bg-white shrink-0">
-                                <button onClick={prevPage} disabled={currentPage===0} className="flex items-center gap-3 text-xs font-black uppercase text-slate-900 disabled:opacity-10 hover:text-blue-600 transition-colors">
-                                    <Icon name="chevron-left" strokeWidth={3} /> Indietro
-                                </button>
-                                <div className="flex flex-col items-center">
-                                    <span className="text-[9px] font-black text-slate-300 uppercase tracking-[0.2em] mb-1">Pagina</span>
-                                    <span className="text-sm font-black text-slate-900">{currentPage+1} / {totalPages}</span>
-                                </div>
-                                <button onClick={nextPage} disabled={currentPage===totalPages-1} className="flex items-center gap-3 text-xs font-black uppercase text-slate-900 disabled:opacity-10 hover:text-blue-600 transition-colors">
-                                    Avanti <Icon name="chevron-right" strokeWidth={3} />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
-</body>
-</html>
+export default App;
